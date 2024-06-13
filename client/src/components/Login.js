@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,Link } from 'react-router-dom';
 
 const Login = () => {
   const [formObj, setFormObj] = useState({ username: "", password: "" });
@@ -79,6 +79,12 @@ const Login = () => {
           <button type="submit" className="mt-3 text-light bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2">
             Submit
           </button>
+          <div className="mt-3 text-center">
+            <span>New user? </span>
+
+          <Link  className='text-primary 'to="/signup">Register here</Link>
+          </div>
+
         </form>
         {loggedIn && <div className="alert alert-success mt-3">Successfully logged in! Redirecting to home...</div>}
       </div>

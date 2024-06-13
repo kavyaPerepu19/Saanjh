@@ -1,3 +1,108 @@
+# import fitz  # PyMuPDF
+# import sys
+# import json
+
+# def process_pdf(file_path):
+#     # Open the PDF file
+#     doc = fitz.open(file_path)
+#     # Load the first page
+#     page = doc.load_page(0)
+#     # Extract text from the page
+#     text = page.get_text()
+
+#     # Dictionary to store details
+#     details = {
+#         "PATIENT NAME": "",
+#         "SEX": "",
+#         "AGE": "",
+#         "WEIGHT": "",
+#         "TEST TYPE": "URINE TEST",
+#         "TEST RESULTS": {
+#             "Color": "",
+#             "Appearance": "",
+#             "Specific Gravity": "",
+#             "pH": "",
+#             "Protein": "",
+#             "Glucose": "",
+#             "Ketones": "",
+#             "Bilirubin": "",
+#             "Urobilinogen": "",
+#             "Nitrite": "",
+#             "Leukocyte Esterase": "",
+#             "Microscopic Examination": {
+#                 "WBCs": "",
+#                 "RBCs": "",
+#                 "Bacteria": "",
+#                 "Epithelial Cells": ""
+#             }
+#         },
+#         "ADDITIONAL INFORMATION": {
+#             "Symptoms": "",
+#             "Current Medication Usage": "",
+#             "Any extra information you'd want to give": ""
+#         }
+#     }
+
+#     # Split the text into lines
+#     lines = text.split('\n')
+
+#     i = 0
+#     # Iterate through lines to extract information
+#     while i < len(lines):
+#         line_lower = lines[i].strip().lower()  # Convert the line to lowercase
+#         if "patient name" in line_lower:
+#             details["PATIENT NAME"] = lines[i + 1]
+#         elif ("male" in line_lower or "female" in line_lower) and i <= 10:
+#             details["SEX"] = lines[i]
+#         elif "years" in line_lower:
+#             details["AGE"] = lines[i]
+#         elif "kgs" in line_lower:
+#             details["WEIGHT"] = lines[i + 1]
+
+#         elif "color" in line_lower:
+#             details["TEST RESULTS"]["Color"] = lines[i + 1]
+#         elif "appearance" in line_lower:
+#             details["TEST RESULTS"]["Appearance"] = lines[i + 1]
+#         elif "specific gravity" in line_lower:
+#             details["TEST RESULTS"]["Specific Gravity"] = lines[i + 1]
+#         elif "ph" in line_lower:
+#             details["TEST RESULTS"]["pH"] = lines[i + 1]
+#         elif "protein" in line_lower:
+#             details["TEST RESULTS"]["Protein"] = lines[i + 1]
+#         elif "glucose" in line_lower:
+#             details["TEST RESULTS"]["Glucose"] = lines[i + 1]
+#         elif "ketones" in line_lower:
+#             details["TEST RESULTS"]["Ketones"] = lines[i + 1]
+#         elif "bilirubin" in line_lower:
+#             details["TEST RESULTS"]["Bilirubin"] = lines[i + 1]
+#         elif "urobilinogen" in line_lower:
+#             details["TEST RESULTS"]["Urobilinogen"] = lines[i + 1]
+#         elif "nitrite" in line_lower:
+#             details["TEST RESULTS"]["Nitrite"] = lines[i + 1]
+#         elif "leukocyte esterase" in line_lower:
+#             details["TEST RESULTS"]["Leukocyte Esterase"] = lines[i + 1]
+
+#         elif "wbcs" in line_lower:
+#             details["TEST RESULTS"]["Microscopic Examination"]["WBCs"] = lines[i + 1]
+#         elif "rbcs" in line_lower:
+#             details["TEST RESULTS"]["Microscopic Examination"]["RBCs"] = lines[i + 1]
+#         elif "bacteria" in line_lower:
+#             details["TEST RESULTS"]["Microscopic Examination"]["Bacteria"] = lines[i + 1]
+#         elif "epithelial cells" in line_lower:
+#             details["TEST RESULTS"]["Microscopic Examination"]["Epithelial Cells"] = lines[i + 1]
+
+#         i += 1
+
+#     return details
+
+# if __name__ == "__main__":
+#     file_path = sys.argv[1]
+#     details = process_pdf(file_path)
+#     print(json.dumps(details, indent=4))
+
+
+
+
 import fitz  # PyMuPDF
 import sys
 import json

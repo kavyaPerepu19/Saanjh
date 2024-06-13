@@ -2,11 +2,19 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const makePredictionRequest = async (formData) => {
+  console.log('before going Form data:', formData);
+
+  // Convert formData to a string
+  let formDataString = "";
+  for (const [key, value] of Object.entries(formData)) {
+    formDataString += `${key}: ${value}\n`;
+  }
+
   try {
     const response = await axios.post('http://localhost:8080/query', {
-      inputs: JSON.stringify(formData + 'give the diagnosis of the person with above blood work in 50 words') // Convert formData to JSON string
+      inputs: formDataString + "what is the disease and complete your response in 150 words"
     });
-    console.log('Prediction response:', response.data[0]);
+    console.log('Prediction response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error making prediction:', error);
@@ -31,6 +39,7 @@ const EditableForm = ({ initialData }) => {
     nested[path[path.length - 1]] = value;
 
     setFormData(updatedFormData);
+    console.log('Updated form data:', updatedFormData)
   };
 
   const renderFields = (data, path = []) => {
@@ -137,7 +146,13 @@ const EditableForm = ({ initialData }) => {
           <div className="flex justify-center w-5/6 mt-4 mx-1.5">
             <div className="border border-gray-300 rounded p-4">
               <h2 className="text-xl font-semibold mb-2 text-center">Prediction Result</h2>
-              <p>{predictionResult.generated_text.slice(84,-1).replace(/^.*: /, '')}</p> {/* Remove prompt from generated text */}
+              <p>
+                {(() => {
+                  const text = predictionResult.generated_text;
+                  const endIndex = text.lastIndexOf('.');
+                  return text.slice(225, endIndex + 1).replace(/^.*: /, '');
+                })()}
+              </p>
             </div>
           </div>
         )
