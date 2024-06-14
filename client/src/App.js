@@ -12,9 +12,10 @@ import ChatBot from './components/ChatBot';
 
 
 const App = () => {
+  
   return (
     <div>
-      <Header className='mb-1.5'></Header>
+      <Header ></Header>
     {/* <div className='App-header'> */}
     
     <Routes>

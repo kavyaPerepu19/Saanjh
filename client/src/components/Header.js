@@ -6,10 +6,9 @@ const Header = () => {
 
   return (
     <div>
-      <nav className="bg-primary py-2" >
+      <nav className="navbar navbar-expand-lg fixed-top" style={{ background: 'rgba(0, 0, 0, 0.5)' }}>
         <div className="container mx-auto flex items-center justify-between px-4">
-
-          <button 
+          <button
             className="text-white md:hidden"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle navigation"
@@ -27,14 +26,14 @@ const Header = () => {
             />
           </Link>
 
-          <div className={`md:flex md:items-center md:space-x-6 ${isOpen ? 'block' : 'hidden'}`}>
+          <div className={`md:flex md:items-center md:space-x-6  ${isOpen ? 'block' : 'hidden'}` }>
             <ul className="flex flex-col md:flex-row md:space-x-4">
               <li className="nav-item">
                 <Link to="/login" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Login</Link>
               </li>
               <li className="nav-item">
-                  <Link to="/signup" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Signup</Link>
-                </li>
+                <Link to="/signup" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Signup</Link>
+              </li>
               <li className="nav-item">
                 <Link to="/profile" className="text-white text-lg mb-2 md:mb-0">Profile</Link>
               </li>
@@ -42,7 +41,7 @@ const Header = () => {
                 <Link to="/form" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Form</Link>
               </li>
               <li className='nav-item'>
-              <Link to="/chatbot" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Chatbot</Link>
+                <Link to="/chatbot" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Chatbot</Link>
               </li>
             </ul>
           </div>

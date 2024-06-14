@@ -27,6 +27,7 @@ app.post('/query', (req, res) => {
   const options = {
       hostname: 'api-inference.huggingface.co',
       path: '/models/mistralai/Mistral-7B-Instruct-v0.3',
+      //https://api-inference.huggingface.co/models/BioMistral/BioMistral-7B
       method: 'POST',
       headers: {
           'Authorization': `Bearer ${process.env.HF_API_KEY}`,

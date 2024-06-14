@@ -1,32 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { useMutation } from '@tanstack/react-query';
+import Modal from 'react-modal'; // Import react-modal
 
-const makePredictionRequest = async (formData) => {
-  console.log('before going Form data:', formData);
-
-  // Convert formData to a string
-  let formDataString = "";
-  for (const [key, value] of Object.entries(formData)) {
-    formDataString += `${key}: ${value}\n`;
-  }
-
-  try {
-    const response = await axios.post('http://localhost:8080/query', {
-      inputs: formDataString + "what is the disease and complete your response in 150 words"
-    });
-    console.log('Prediction response:', response.data);
-    return response.data;
-  } catch (error) {
-    console.error('Error making prediction:', error);
-    throw error;
-  }
+const makeRequestAPI = async (prompt) => {
+  const response = await axios.post('http://localhost:8080/diagnose', { prompt });
+  return response.data;
 };
 
 const EditableForm = ({ initialData }) => {
   const [formData, setFormData] = useState(initialData || {});
   const [isEditing, setIsEditing] = useState(false);
-  const [predictionResult, setPredictionResult] = useState(null); // State to store prediction result
-  const [isLoading, setIsLoading] = useState(false); // State to track loading status
+  const [diagnosisReport, setDiagnosisReport] = useState(null);
+  const [showModal, setShowModal] = useState(false); // State to control modal visibility
+  const reportRef = useRef(null);
+
+  useEffect(() => {
+    setFormData(initialData);
+  }, [initialData]);
+
+  useEffect(() => {
+    if (reportRef.current) {
+      reportRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [diagnosisReport]);
 
   const handleInputChange = (e, path) => {
     const { name, value } = e.target;
@@ -39,7 +36,6 @@ const EditableForm = ({ initialData }) => {
     nested[path[path.length - 1]] = value;
 
     setFormData(updatedFormData);
-    console.log('Updated form data:', updatedFormData)
   };
 
   const renderFields = (data, path = []) => {
@@ -49,28 +45,43 @@ const EditableForm = ({ initialData }) => {
 
       if (typeof value === 'object' && value !== null) {
         return (
-          <div key={key}>
+          <div key={key} style={{ marginBottom: '10px' }}>
             <strong style={{ display: 'block', marginTop: '10px', marginBottom: '5px' }}>{key}</strong>
             {renderFields(value, currentPath)}
           </div>
         );
       } else {
         return (
-          <div key={key} style={{ display: 'flex', justifyContent: 'center', marginBottom: '10px', fontSize: '15px' }}>
-            <div className="text-light bg-primary" style={{ textAlign: 'center', justifyContent: 'center', width: '150px', fontWeight: '400', borderRadius: '6px', padding: '4px' }}>
+          <div key={key} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', marginTop: '5%' }}>
+            <div style={{ width: '150px', height: '30px', fontWeight: '400', borderRadius: '6px', padding: '4px', textAlign: 'center', backgroundColor: '#007bff', color: '#fff' }}>
               {key}
             </div>
-            <div className="text-light bg-dark" style={{ width: '200px', paddingLeft: '1rem', backgroundColor: 'ButtonHighlight', borderRadius: '6px', paddingTop: '4px' }}>
+            <div style={{ flexGrow: 1, paddingLeft: '1rem', borderRadius: '6px', paddingTop: '4px', backgroundColor: 'transparent' }}>
               {isEditing ? (
                 <input
+                  className='text-dark' // Ensure text color is black
                   type="text"
                   name={key}
                   value={value}
                   onChange={(e) => handleInputChange(e, currentPath)}
-                  style={{ backgroundColor: 'ButtonHighlight', color: 'black' }}
+                  style={{ width: '100%', height: '40px', color: 'black', backgroundColor: '#f0f0f0', border: '1px solid #ccc', borderRadius: '4px', padding: '8px' }}
                 />
               ) : (
-                <span>{value}</span>
+                <div
+                  style={{
+                    width: '100%',
+                    height: '40px',
+                    color: 'black',
+                    backgroundColor: '#f0f0f0',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    padding: '8px',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  {value}
+                </div>
               )}
             </div>
           </div>
@@ -79,84 +90,112 @@ const EditableForm = ({ initialData }) => {
     });
   };
 
+  const mutation = useMutation({
+    mutationFn: makeRequestAPI,
+    mutationKey: ['gemini-ai-request'],
+    onSuccess: (data) => {
+      setDiagnosisReport(data.replace(/\*+/g, '').split('\n').map((line, index) => <p key={index}>{line}</p>));
+      setShowModal(true); // Open modal when data is fetched
+    }
+  });
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+    const prompt = JSON.stringify(formData);
+    mutation.mutate(prompt);
+  };
+
   const handleSave = async () => {
     try {
-      // Call function to save data
+      const response = await axios.post('http://localhost:8080/save', formData);
+      console.log('Save response:', response.data);
       setIsEditing(false);
     } catch (error) {
       console.error('Error saving data:', error);
     }
   };
 
-  const handlePredict = async () => {
-    try {
-      setIsLoading(true); // Set loading state to true
-      const prediction = await makePredictionRequest(formData);
-      setPredictionResult(prediction[0]); // Set prediction result to state
-    } catch (error) {
-      console.error('Error making prediction:', error);
-    } finally {
-      setIsLoading(false); // Set loading state to false after prediction
-    }
+  const closeModal = () => {
+    setShowModal(false);
+    setDiagnosisReport(null); // Clear diagnosis report when closing modal
   };
 
   return (
-    <div className="pl-10 pr-10 flex flex-col items-center">
-      <h1 className="mb-4 text-3xl font-extrabold text-light md:text-5xl lg:text-5xl pb-2 flex items-center">
-        Report Details
-        <span className="ml-4">
-          <img width={40} src="https://res.cloudinary.com/duwadnxwf/image/upload/v1716300380/patient_u29wkb.png" alt="patient icon" />
-        </span>
-      </h1>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', marginTop: '6%' }}>
+      <div className='border rounded-xl' style={{ backgroundColor: 'rgba(220, 220, 220, 0.76)' }}>
+        <h1 className="mb-4 text-3xl font-extrabold text-blue-600 md:text-5xl lg:text-5xl pb-2 flex items-center justify-center">
+          Report Details
+          <span className="ml-4">
+            <img width={40} src="https://res.cloudinary.com/duwadnxwf/image/upload/v1716300380/patient_u29wkb.png" alt="patient icon" />
+          </span>
+        </h1>
 
-      {renderFields(formData)}
+        {renderFields(formData)}
 
-      <button
-        type="button"
-        className="mt-3 text-light bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2"
-        onClick={() => setIsEditing(!isEditing)}
-      >
-        {!isEditing && <img src="https://res.cloudinary.com/duwadnxwf/image/upload/v1716276383/icons8-edit-24_fpgba3.png" className="h-6 w-5 pb-1" />}
-        {isEditing ? 'Cancel' : 'Edit'}
-      </button>
-      {isEditing && (
-        <button
-          type="button"
-          className="mt-3 mb-5 text-dark bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2"
-          onClick={handleSave}
-        >
-          Save
-        </button>
-      )}
-
-      <button
-        type="button"
-        className="mt-3 mb-5 text-black bg-blue-700 font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2"
-        onClick={handlePredict}
-      >
-        Predict
-      </button>
-
-      {isLoading ? (
-        <div className="text-center text-5xl mt-4">
-          <h1>Loading...</h1>
+        <div className='flex justify-center mt-5'>
+          <button
+            type="button"
+            className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2"
+            onClick={() => setIsEditing(!isEditing)}
+          >
+            {!isEditing && <img src="https://res.cloudinary.com/duwadnxwf/image/upload/v1716276383/icons8-edit-24_fpgba3.png" className="h-6 w-5 pb-1" />}
+            {isEditing ? 'Cancel' : 'Edit'}
+          </button>
+          {isEditing &&
+            <button type="button"
+              className="mt-3 mb-5 text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2"
+              onClick={handleSave}>Save</button>}
         </div>
-      ) : (
-        predictionResult && (
-          <div className="flex justify-center w-5/6 mt-4 mx-1.5">
-            <div className="border border-gray-300 rounded p-4">
-              <h2 className="text-xl font-semibold mb-2 text-center">Prediction Result</h2>
-              <p>
-                {(() => {
-                  const text = predictionResult.generated_text;
-                  const endIndex = text.lastIndexOf('.');
-                  return text.slice(225, endIndex + 1).replace(/^.*: /, '');
-                })()}
-              </p>
-            </div>
+
+        {!isEditing &&
+          <form onSubmit={submitHandler} className='flex justify-center'>
+            <button
+              type="submit"
+              className="mt-3 mb-5 text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2"
+            >
+              Diagnose
+            </button>
+          </form>
+        }
+
+        {mutation.isPending && <p className='text-5xl'>Generating your content</p>}
+        {mutation.isError && <p>{mutation.error.message}</p>}
+      </div>
+
+      {/* Modal to display diagnosis report */}
+      <Modal
+        isOpen={showModal}
+        onRequestClose={closeModal}
+        style={{
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 1000
+          },
+          content: {
+            maxWidth: '600px',
+            margin: 'auto',
+            border: '1px solid #ccc',
+            borderRadius: '10px',
+            padding: '20px',
+            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+            backgroundColor: '#fff',
+            textAlign: 'center'
+          }
+        }}
+      >
+        <h2 className='text-2xl font-bold text-gray-800 mb-2'>Diagnosis Report</h2>
+        {diagnosisReport && (
+          <div className='border border-gray-300 p-4 rounded-md'>
+            {diagnosisReport}
           </div>
-        )
-      )}
+        )}
+        <button
+          onClick={closeModal}
+          className='mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg focus:outline-none'
+        >
+          Close
+        </button>
+      </Modal>
     </div>
   );
 };

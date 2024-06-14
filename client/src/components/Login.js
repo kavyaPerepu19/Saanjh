@@ -3,6 +3,34 @@ import axios from 'axios';
 import { useNavigate,Link } from 'react-router-dom';
 
 const Login = () => {
+  const backgroundStyle = {
+    backgroundImage: "url('https://wallpaperaccess.com/full/958470.jpg')",
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    height: '100vh',
+    position: 'relative',
+  };
+
+  const blurOverlayStyle = {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backdropFilter: 'blur(6px)',
+    zIndex: 0,
+  };
+
+  const contentStyle = {
+    zIndex: 1,
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    color: 'white',
+    textAlign: 'center',
+    fontFamily: 'Roboto, sans-serif',
+  };
   const [formObj, setFormObj] = useState({ username: "", password: "" });
   const [loggedIn, setLoggedIn] = useState(false);
   const [errorLoggingIn, setErrorLoggingIn] = useState('');
@@ -45,14 +73,17 @@ const Login = () => {
   );
 
   return (
-    <div className="d-flex justify-content-center align-items-center mt-5">
-      <div className="card p-4" style={{ maxWidth: "400px", width: "100%", background: '#EAEAEA' }}>
+    <div  style={backgroundStyle}>
+      <div style={blurOverlayStyle}></div>
+    <div className="d-flex justify-content-center align-items-center ">
+
+      <div className="card p-4 " style={{ backgroundColor: 'rgba(220, 220, 220, 0.76)' ,maxWidth: "400px", width: "100%", background: '#EAEAEA' ,marginTop:'10%'}}>
         <h1 className="mb-4 text-3xl font-extrabold text-primary md:text-5xl lg:text-5xl pb-2 flex items-center">Login</h1>
         <form onSubmit={handleSubmit}>
           {errorLoggingIn && <Error />}
           <div className="mb-3">
             <label htmlFor="username" className="form-label text-dark">
-              Username
+              Email
             </label>
             <input
               type="text"
@@ -88,6 +119,7 @@ const Login = () => {
         </form>
         {loggedIn && <div className="alert alert-success mt-3">Successfully logged in! Redirecting to home...</div>}
       </div>
+    </div>
     </div>
   );
 };

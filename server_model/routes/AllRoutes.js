@@ -10,7 +10,7 @@ const generateUniqueUserId = async () => {
   let userId;
 
   while (!unique) {
-    userId = Math.floor(1000 + Math.random() * 9000).toString(); // Generate a 4-digit number
+    userId = Math.floor(1000 + Math.random() * 9000).toString(); 
     let existingUser = await userIdModel.findOne({ userId });
     if (!existingUser) {
       unique = true;
@@ -39,7 +39,7 @@ allroutes.post('/signup', upload.none(), async (req, res) => {
 
     let userFromDB = await newUser.save();
 
-    // Save the username: userId pair to the userIdModel
+    
     let newUserId = new userIdModel({
       username: req.body.username,
       userId

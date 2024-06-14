@@ -38,13 +38,25 @@ const UploadReport = ({ onReportData }) => {
   }, [diagnosisReport]);
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '3rem' }}>
+    <div className='rounded-xl' style={{ display: 'flex',alignItems:'center', justifyContent: 'center', marginTop: '3rem', width:'300px',
+      height: '200px',marginLeft:'38%',marginTop:'15%',backgroundColor: 'rgba(220, 220, 220, 0.76)' }}>
       <div>
-        <input type="file" onChange={handleFileChange} />
+        <input
+          type="file"
+          onChange={handleFileChange}
+          id="file-upload"
+          style={{ display: 'none' }} // Hide the default file input
+        />
+        <label
+          htmlFor="file-upload"
+          className="custom-file-upload text-dark font-medium rounded-lg text-s px-3 py-2 text-center me-2 mb-2"
+        >
+          Select File
+        </label>
         <div>
           <button
             type="button"
-            className="mt-2 text-light bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-3 py-2 text-center me-2 mb-2"
+            className="mt-2 mx-1 text-light bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-3 py-2 text-center me-2 mb-2"
             onClick={handleUpload}
           >
             Upload Report

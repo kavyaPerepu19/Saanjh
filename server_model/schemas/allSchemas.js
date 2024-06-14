@@ -23,7 +23,6 @@ let userSchema = new mongoose.Schema({
 
 let usersModel = mongoose.model('User', userSchema);
 
-// New schema for storing username: userId pairs
 let userIdSchema = new mongoose.Schema({
   username: {
     type: String,
