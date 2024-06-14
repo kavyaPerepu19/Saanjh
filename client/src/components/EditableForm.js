@@ -46,7 +46,7 @@ const EditableForm = ({ initialData }) => {
       if (typeof value === 'object' && value !== null) {
         return (
           <div key={key} style={{ marginBottom: '10px' }}>
-            <strong style={{ display: 'block', marginTop: '10px', marginBottom: '5px' }}>{key}</strong>
+            <strong style={{ display: 'block', marginTop: '10px',color:'black', marginBottom: '5px' }}>{key}</strong>
             {renderFields(value, currentPath)}
           </div>
         );
@@ -168,7 +168,8 @@ const EditableForm = ({ initialData }) => {
         onRequestClose={closeModal}
         style={{
           overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)'
+            ,color: 'black',
             zIndex: 1000
           },
           content: {
@@ -178,14 +179,14 @@ const EditableForm = ({ initialData }) => {
             borderRadius: '10px',
             padding: '20px',
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-            backgroundColor: '#fff',
+           backgroundColor: 'rgba(220, 220, 220, 0.76)',
             textAlign: 'center'
           }
         }}
       >
         <h2 className='text-2xl font-bold text-gray-800 mb-2'>Diagnosis Report</h2>
         {diagnosisReport && (
-          <div className='border border-gray-300 p-4 rounded-md'>
+          <div className='border border-gray-300 p-4 rounded-md text-gray'>
             {diagnosisReport}
           </div>
         )}
