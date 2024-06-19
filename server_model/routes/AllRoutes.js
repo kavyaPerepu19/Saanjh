@@ -21,10 +21,21 @@ const generateUniqueUserId = async () => {
 };
 
 allroutes.get('/', (req, res) => {
-  console.log("reached root");
-  res.send("backend home");
+  console.log("Reached root");
+  res.send("Backend home");
 });
+allroutes.get('/userIds', async (req, res) => {
+  try {
+  
+    const userIds = await userIdModel.find({}, 'userId username');
 
+    
+    res.json(userIds);
+  } catch (error) {
+    console.error('Error fetching userIds:', error);
+    res.status(500).send('Internal Server Error: Failed to fetch userIds');
+  }
+});
 allroutes.post('/signup', upload.none(), async (req, res) => {
   try {
     console.log(req.body);
@@ -39,12 +50,13 @@ allroutes.post('/signup', upload.none(), async (req, res) => {
 
     let userFromDB = await newUser.save();
 
-    
-    let newUserId = new userIdModel({
-      username: req.body.username,
-      userId
-    });
-    await newUserId.save();
+    if (req.body.userType === "patient") {
+      let newUserId = new userIdModel({
+        username: req.body.username,
+        userId
+      });
+      await newUserId.save();
+    }
 
     console.log(userFromDB);
     res.send(userFromDB);

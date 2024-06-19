@@ -81,7 +81,7 @@ const Sign = () => {
     <div style={backgroundStyle}>
       <div style={blurOverlayStyle}></div>
     <div className="d-flex justify-content-center align-items-center ">
-    <div className="card p-4 " style={{ backgroundColor: 'rgba(220, 220, 220, 0.76)' ,maxWidth: "400px", width: "100%", background: '#EAEAEA' ,marginTop:'7%'}}>
+    <div className="card p-4 " style={{ backgroundColor: 'rgba(220, 220, 220, 0.76)' ,maxWidth: "400px", width: "100%" ,marginTop:'7%'}}>
         <h1 className="mb-4 text-3xl font-extrabold text-primary md:text-5xl lg:text-5xl pb-2 flex items-center">Sign Up</h1>
         <form onSubmit={handleSubmit}>
           {errorSigningUp && <Error />}
@@ -125,7 +125,7 @@ const Sign = () => {
               <option value="" disabled>
                 --select--
               </option>
-              <option value="family">Family</option>
+              <option value="patient">Patient</option>
               <option value="management">Management</option>
               <option value="medicalStaff">Medical Staff</option>
               <option value="careTakers">Care Takers</option>

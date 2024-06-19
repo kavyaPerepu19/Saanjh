@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import EditableForm from "./EditableForm";
 import UploadReport from "./UploadReport";
+import PatientSel from "./PatientSel";
 
 export default function Form() {
   const backgroundStyle = {
@@ -9,17 +10,20 @@ export default function Form() {
     backgroundPosition: 'center',
     height: '100vh',
     position: 'relative',
-     overflowY: 'auto'
+    overflowY: 'auto',
+    
   };
 
   const blurOverlayStyle = {
     position: 'absolute',
     top: 0,
     left: 0,
+    bottom: 0,
     width: '100%',
-    height: '100%',
+    height: '400vh',
     backdropFilter: 'blur(6px)',
     zIndex: 0,
+     overflowY: 'auto'
   };
 
   const contentStyle = {
@@ -34,26 +38,32 @@ export default function Form() {
     background: 'rgba(220, 220, 220, 0.5)',
     maxHeight:'92%',
     marginTop: '8%',
-    // marginBottom: '10%',
   };
 
-  
+  const [selectedPatientId, setSelectedPatientId] = useState('');
   const [reportData, setReportData] = useState(null);
-  
+
+  const handlePatientSelect = (patientId) => {
+    setSelectedPatientId(patientId); // Update selectedPatientId in Form.js
+    console.log('Selected Patient ID in Form:', patientId); // Verify patientId is received here
+  };
+
+  const handleReportData = (data) => {
+    setReportData(data);
+  };
 
   return (
-    <div style={backgroundStyle} >
-    {/* <div style={{marginTop: '150px'}}> */}
-         
-      {/* <div style={blurOverlayStyle}></div> */}
-      {/* <div style={contentStyle}> */}
-      {reportData ? (
-        <EditableForm initialData={reportData} />
-      ) : (
-        <UploadReport  className='bg-light' onReportData={setReportData} />
-      )}
+    <div style={backgroundStyle}>
+      <div style={blurOverlayStyle}></div>
+      <div style={contentStyle}>
+        {selectedPatientId === '' ? (
+          <PatientSel onSelectPatient={handlePatientSelect} />
+        ) : reportData ? (
+          <EditableForm initialData={reportData} selectedPatientId={selectedPatientId} />
+        ) : (
+          <UploadReport selectedPatientId={selectedPatientId} onReportData={handleReportData} />
+        )}
+      </div>
     </div>
-    // </div>
-    // </div>
   );
 }

@@ -1,18 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useMutation } from '@tanstack/react-query';
-import Modal from 'react-modal'; // Import react-modal
+import Modal from 'react-modal';
 
 const makeRequestAPI = async (prompt) => {
-  const response = await axios.post('http://localhost:8080/diagnose', { prompt });
-  return response.data;
+  try {
+    const response = await axios.post('http://localhost:8080/diagnose', { prompt });
+    return response.data;
+  } catch (error) {
+    throw new Error(`Error in makeRequestAPI: ${error.message}`);
+  }
 };
 
-const EditableForm = ({ initialData }) => {
+const EditableForm = ({selectedPatientId, initialData }) => {
+  console.log('EditableForm selectedPatientId:', selectedPatientId);
   const [formData, setFormData] = useState(initialData || {});
   const [isEditing, setIsEditing] = useState(false);
   const [diagnosisReport, setDiagnosisReport] = useState(null);
-  const [showModal, setShowModal] = useState(false); // State to control modal visibility
+  const [showModal, setShowModal] = useState(false);
   const reportRef = useRef(null);
 
   useEffect(() => {
@@ -46,7 +51,7 @@ const EditableForm = ({ initialData }) => {
       if (typeof value === 'object' && value !== null) {
         return (
           <div key={key} style={{ marginBottom: '10px' }}>
-            <strong style={{ display: 'block', marginTop: '10px',color:'black', marginBottom: '5px' }}>{key}</strong>
+            <strong style={{ display: 'block', marginTop: '10px', marginBottom: '5px', color: 'black' }}>{key}</strong>
             {renderFields(value, currentPath)}
           </div>
         );
@@ -59,7 +64,7 @@ const EditableForm = ({ initialData }) => {
             <div style={{ flexGrow: 1, paddingLeft: '1rem', borderRadius: '6px', paddingTop: '4px', backgroundColor: 'transparent' }}>
               {isEditing ? (
                 <input
-                  className='text-dark' // Ensure text color is black
+                  className='text-dark'
                   type="text"
                   name={key}
                   value={value}
@@ -95,7 +100,7 @@ const EditableForm = ({ initialData }) => {
     mutationKey: ['gemini-ai-request'],
     onSuccess: (data) => {
       setDiagnosisReport(data.replace(/\*+/g, '').split('\n').map((line, index) => <p key={index}>{line}</p>));
-      setShowModal(true); // Open modal when data is fetched
+      setShowModal(true);
     }
   });
 
@@ -117,7 +122,7 @@ const EditableForm = ({ initialData }) => {
 
   const closeModal = () => {
     setShowModal(false);
-    setDiagnosisReport(null); // Clear diagnosis report when closing modal
+    setDiagnosisReport(null);
   };
 
   return (
@@ -162,14 +167,12 @@ const EditableForm = ({ initialData }) => {
         {mutation.isError && <p>{mutation.error.message}</p>}
       </div>
 
-      {/* Modal to display diagnosis report */}
       <Modal
         isOpen={showModal}
         onRequestClose={closeModal}
         style={{
           overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.5)'
-            ,color: 'black',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
             zIndex: 1000
           },
           content: {
@@ -179,14 +182,14 @@ const EditableForm = ({ initialData }) => {
             borderRadius: '10px',
             padding: '20px',
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-           backgroundColor: 'rgba(220, 220, 220, 0.76)',
+            backgroundColor: 'rgba(220, 220, 220, 0.76)',
             textAlign: 'center'
           }
         }}
       >
-        <h2 className='text-2xl font-bold text-gray-800 mb-2'>Diagnosis Report</h2>
+        <h2 className='text-2xl font-bold text-dark-800 mb-2'>Diagnosis Report</h2>
         {diagnosisReport && (
-          <div className='border border-gray-300 p-4 rounded-md text-gray'>
+          <div className='border border-gray-300 p-4 rounded-md text-dark'>
             {diagnosisReport}
           </div>
         )}

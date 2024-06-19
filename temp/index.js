@@ -1,6 +1,8 @@
 const express = require('express');
 const https = require('https');
 const cors = require('cors');
+const natural = require('natural');
+const tokenizer = new natural.WordTokenizer();
 
 const app = express();
 const port = 5000;
@@ -63,3 +65,4 @@ app.post('/query', (req, res) => {
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
+

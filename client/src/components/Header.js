@@ -31,9 +31,9 @@ const Header = () => {
               <li className="nav-item">
                 <Link to="/login" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Login</Link>
               </li>
-              <li className="nav-item">
+              {/* <li className="nav-item">
                 <Link to="/signup" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Signup</Link>
-              </li>
+              </li> */}
               <li className="nav-item">
                 <Link to="/profile" className="text-white text-lg mb-2 md:mb-0">Profile</Link>
               </li>

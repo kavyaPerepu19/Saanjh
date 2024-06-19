@@ -1,7 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const UploadReport = ({ onReportData }) => {
+const UploadReport = ({selectedPatientId, onReportData }) => {
+  const backgroundStyle = {
+    backgroundImage: "url('https://wallpaperaccess.com/full/958470.jpg')",
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    height: '100vh',
+    position: 'relative',
+  };
+
+  const blurOverlayStyle = {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backdropFilter: 'blur(6px)',
+    zIndex: 0,
+  };
+  const contentStyle = {
+    zIndex: 1,
+    position: 'absolute',
+    top: '50%',
+    left: '40%',
+    transform: 'translate(-50%, -50%)',
+    color: 'white',
+    textAlign: 'center',
+    fontFamily: 'Roboto, sans-serif',
+  };
   const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
   const [diagnosisReport, setDiagnosisReport] = useState(null);
@@ -10,6 +37,7 @@ const UploadReport = ({ onReportData }) => {
     setFile(e.target.files[0]);
   };
 
+  console.log('Selected Patient ID:', selectedPatientId); 
   const handleUpload = async () => {
     console.log('Upload button clicked'); // Check if function is called
 
@@ -38,7 +66,10 @@ const UploadReport = ({ onReportData }) => {
   }, [diagnosisReport]);
 
   return (
-    <div className='rounded-xl' style={{ display: 'flex',alignItems:'center', justifyContent: 'center', marginTop: '3rem', width:'300px',
+    <div >
+      <div style={blurOverlayStyle}></div>
+      <div style={contentStyle}>
+    <div className='rounded-xl' style={ { display: 'flex',alignItems:'center', justifyContent: 'center', marginTop: '3rem', width:'300px',
       height: '200px',marginLeft:'38%',marginTop:'15%',backgroundColor: 'rgba(220, 220, 220, 0.76)' }}>
       <div>
         <input
@@ -64,6 +95,8 @@ const UploadReport = ({ onReportData }) => {
           {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
       </div>
+    </div>
+    </div>
     </div>
   );
 };

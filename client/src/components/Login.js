@@ -77,7 +77,7 @@ const Login = () => {
       <div style={blurOverlayStyle}></div>
     <div className="d-flex justify-content-center align-items-center ">
 
-      <div className="card p-4 " style={{ backgroundColor: 'rgba(220, 220, 220, 0.76)' ,maxWidth: "400px", width: "100%", background: '#EAEAEA' ,marginTop:'10%'}}>
+      <div className="card p-4 " style={{ backgroundColor: 'rgba(220, 220, 220, 0.76)' ,maxWidth: "400px", width: "100%" ,marginTop:'10%'}}>
         <h1 className="mb-4 text-3xl font-extrabold text-primary md:text-5xl lg:text-5xl pb-2 flex items-center">Login</h1>
         <form onSubmit={handleSubmit}>
           {errorLoggingIn && <Error />}
