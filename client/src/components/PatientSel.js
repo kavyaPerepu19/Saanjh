@@ -12,7 +12,7 @@ const PatientSel = ({ onSelectPatient }) => {
   const fetchPatientIds = async () => {
     try {
       const response = await axios.get('http://localhost:8080/api/userIds');
-      setPatientIds(response.data); // Assuming response.data is an array of userId objects [{userId: "123", username: "JohnDoe"}, ...]
+      setPatientIds(response.data); 
     } catch (error) {
       console.error('Error fetching patient IDs:', error);
     }
@@ -33,7 +33,7 @@ const PatientSel = ({ onSelectPatient }) => {
         <h2 className="mb-4 text-3xl font-extrabold text-primary text-center md:text-5xl lg:text-5xl pb-2">Upload Data</h2>
         <form onSubmit={handleSubmit} className="shadow-md rounded px-8 pt-6 pb-8 mb-4">
           <div className="mb-4">
-            <label htmlFor="patientId" className="block text-gray-700 text-sm font-bold mb-2">Select Patient ID</label>
+            <label htmlFor="patientId" className="block text-dark text-sm font-bold mb-2">Select Patient ID</label>
             <select
               className="form-select block w-full mt-1"
               id="patientId"
@@ -41,9 +41,9 @@ const PatientSel = ({ onSelectPatient }) => {
               value={selectedPatientId}
               onChange={handlePatientIdChange}
             >
-              <option value="" disabled>-- Select Patient ID --</option>
+              <option className='text-dark'value="" disabled>-- Select Patient ID --</option>
               {patientIds.map(patient => (
-                <option key={patient.userId} value={patient.userId}>{patient.userId} - {patient.username}</option>
+                <option key={patient.userId} value={patient.userId}>{patient.userId} - {patient.name}</option>
               ))}
             </select>
           </div>

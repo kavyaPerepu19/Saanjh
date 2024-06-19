@@ -1,48 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 
-const UploadReport = ({selectedPatientId, onReportData }) => {
-  const backgroundStyle = {
-    backgroundImage: "url('https://wallpaperaccess.com/full/958470.jpg')",
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    height: '100vh',
-    position: 'relative',
-  };
-
-  const blurOverlayStyle = {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backdropFilter: 'blur(6px)',
-    zIndex: 0,
-  };
-  const contentStyle = {
-    zIndex: 1,
-    position: 'absolute',
-    top: '50%',
-    left: '40%',
-    transform: 'translate(-50%, -50%)',
-    color: 'white',
-    textAlign: 'center',
-    fontFamily: 'Roboto, sans-serif',
-  };
+const UploadReport = ({ onReportData }) => {
   const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
-  const [diagnosisReport, setDiagnosisReport] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
+    setError(null); 
   };
 
-  console.log('Selected Patient ID:', selectedPatientId); 
   const handleUpload = async () => {
-    console.log('Upload button clicked'); // Check if function is called
+    if (!file) {
+      setError('Please select a file to upload.');
+      return;
+    }
 
     const formData = new FormData();
     formData.append('file', file);
+
+    setUploading(true);
+    setError(null);
 
     try {
       const response = await axios.post('http://localhost:8080/upload', formData, {
@@ -50,53 +29,31 @@ const UploadReport = ({selectedPatientId, onReportData }) => {
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log('Server response:', response.data); // Check server response
-      onReportData(response.data);
-      setDiagnosisReport(response.data); // Ensure this is the correct path
+      onReportData(response.data.details); 
     } catch (error) {
+      setError('Error uploading file. Please try again.');
       console.error('Error uploading file:', error);
-      setError('Error uploading file');
+    } finally {
+      setUploading(false);
     }
   };
 
-  useEffect(() => {
-    if (diagnosisReport) {
-      console.log('Diagnosis Report:', diagnosisReport); // Check state update
-    }
-  }, [diagnosisReport]);
-
   return (
-    <div >
-      <div style={blurOverlayStyle}></div>
-      <div style={contentStyle}>
-    <div className='rounded-xl' style={ { display: 'flex',alignItems:'center', justifyContent: 'center', marginTop: '3rem', width:'300px',
-      height: '200px',marginLeft:'38%',marginTop:'15%',backgroundColor: 'rgba(220, 220, 220, 0.76)' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', margin: '3rem',backgroundColor: 'rgba(220, 220, 220, 0.76)' }} className='border rounded-xl'>
       <div>
-        <input
-          type="file"
-          onChange={handleFileChange}
-          id="file-upload"
-          style={{ display: 'none' }} // Hide the default file input
-        />
-        <label
-          htmlFor="file-upload"
-          className="custom-file-upload text-dark font-medium rounded-lg text-s px-3 py-2 text-center me-2 mb-2"
-        >
-          Select File
-        </label>
+        <input type="file" onChange={handleFileChange} className='text-dark ' />
         <div>
           <button
             type="button"
-            className="mt-2 mx-1 text-light bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-3 py-2 text-center me-2 mb-2"
+            className="mt-2 text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-3 py-2 text-center me-2 mb-2"
             onClick={handleUpload}
+            disabled={uploading}
           >
-            Upload Report
+            {uploading ? 'Uploading...' : 'Upload Report'}
           </button>
           {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
       </div>
-    </div>
-    </div>
     </div>
   );
 };

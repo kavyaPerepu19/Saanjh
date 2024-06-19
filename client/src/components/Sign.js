@@ -31,7 +31,8 @@ const Sign = () => {
     textAlign: 'center',
     fontFamily: 'Roboto, sans-serif',
   };
-  const [formObj, setFormObj] = useState({ username: "", password: "", userType: "" });
+
+  const [formObj, setFormObj] = useState({ name: "", username: "", password: "", userType: "" });
   const [signedUp, setSignedUp] = useState(false);
   const [errorSigningUp, setErrorSigningUp] = useState('');
   const navigate = useNavigate();
@@ -80,64 +81,77 @@ const Sign = () => {
   return (
     <div style={backgroundStyle}>
       <div style={blurOverlayStyle}></div>
-    <div className="d-flex justify-content-center align-items-center ">
-    <div className="card p-4 " style={{ backgroundColor: 'rgba(220, 220, 220, 0.76)' ,maxWidth: "400px", width: "100%" ,marginTop:'7%'}}>
-        <h1 className="mb-4 text-3xl font-extrabold text-primary md:text-5xl lg:text-5xl pb-2 flex items-center">Sign Up</h1>
-        <form onSubmit={handleSubmit}>
-          {errorSigningUp && <Error />}
-          <div className="mb-3">
-            <label htmlFor="username" className="form-label text-dark">
-              Email
-            </label>
-            <input
-              type="text"
-              className="form-control form-control-sm"
-              id="username"
-              name="username"
-              value={formObj.username}
-              onChange={changeHandler}
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="password" className="form-label text-dark">
-              Password
-            </label>
-            <input
-              type="password"
-              className="form-control form-control-sm"
-              id="password"
-              name="password"
-              value={formObj.password}
-              onChange={changeHandler}
-            />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="userType" className="form-label text-dark">
-              Select User Type
-            </label>
-            <select
-              className="form-select"
-              id="userType"
-              name="userType"
-              value={formObj.userType}
-              onChange={changeHandler}
-            >
-              <option value="" disabled>
-                --select--
-              </option>
-              <option value="patient">Patient</option>
-              <option value="management">Management</option>
-              <option value="medicalStaff">Medical Staff</option>
-              <option value="careTakers">Care Takers</option>
-            </select>
-          </div>
-          <button type="submit" className="mt-3 text-light bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2">
-            Submit
-          </button>
-        </form>
-        {signedUp && <div className="alert alert-success mt-3">Successfully signed up! Redirecting to login...</div>}
+      <div className="d-flex justify-content-center align-items-center">
+        <div className="card p-4" style={{ backgroundColor: 'rgba(220, 220, 220, 0.76)', maxWidth: "400px", width: "100%", marginTop: '7%' }}>
+          <h1 className="mb-4 text-3xl font-extrabold text-primary md:text-5xl lg:text-5xl pb-2 flex items-center">Sign Up</h1>
+          <form onSubmit={handleSubmit}>
+            {errorSigningUp && <Error />}
+            <div className="mb-3">
+              <label htmlFor="name" className="form-label text-dark">
+                Name
+              </label>
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                id="name"
+                name="name"
+                value={formObj.name}
+                onChange={changeHandler}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="username" className="form-label text-dark">
+                Email
+              </label>
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                id="username"
+                name="username"
+                value={formObj.username}
+                onChange={changeHandler}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label text-dark">
+                Password
+              </label>
+              <input
+                type="password"
+                className="form-control form-control-sm"
+                id="password"
+                name="password"
+                value={formObj.password}
+                onChange={changeHandler}
+              />
+            </div>
+            <div className="mb-3">
+              <label htmlFor="userType" className="form-label text-dark">
+                Select User Type
+              </label>
+              <select
+                className="form-select"
+                id="userType"
+                name="userType"
+                value={formObj.userType}
+                onChange={changeHandler}
+              >
+                <option value="" disabled>
+                  --select--
+                </option>
+                <option value="patient">Patient</option>
+                <option value="management">Management</option>
+                <option value="medicalStaff">Medical Staff</option>
+                <option value="careTakers">Care Takers</option>
+              </select>
+            </div>
+            <button type="submit" className="mt-3 text-light bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2">
+              Submit
+            </button>
+          </form>
+          {signedUp && <div className="alert alert-success mt-3">Successfully signed up! Redirecting to login...</div>}
+        </div>
       </div>
-    </div>
     </div>
   );
 };

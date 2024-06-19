@@ -12,6 +12,13 @@ const makeRequestAPI = async (prompt) => {
   }
 };
 
+const getWeekNumber = () => {
+  const currentDate = new Date();
+  const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
+  const pastDaysOfYear = (currentDate - startOfYear) / 86400000 + 1;
+  return Math.ceil(pastDaysOfYear / 7);
+};
+
 const EditableForm = ({selectedPatientId, initialData }) => {
   console.log('EditableForm selectedPatientId:', selectedPatientId);
   const [formData, setFormData] = useState(initialData || {});
@@ -112,7 +119,9 @@ const EditableForm = ({selectedPatientId, initialData }) => {
 
   const handleSave = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/save', formData);
+      const weekNumber = getWeekNumber();
+      const dataToSave = { ...formData, userId: selectedPatientId, week: weekNumber };
+      const response = await axios.post('http://localhost:8080/save', dataToSave);
       console.log('Save response:', response.data);
       setIsEditing(false);
     } catch (error) {

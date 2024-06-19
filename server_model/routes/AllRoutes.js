@@ -4,13 +4,12 @@ const allroutes = express.Router();
 const multer = require("multer");
 const upload = multer();
 
-// Function to generate unique 4-digit user ID
 const generateUniqueUserId = async () => {
   let unique = false;
   let userId;
 
   while (!unique) {
-    userId = Math.floor(1000 + Math.random() * 9000).toString(); 
+    userId = Math.floor(1000 + Math.random() * 9000).toString();
     let existingUser = await userIdModel.findOne({ userId });
     if (!existingUser) {
       unique = true;
@@ -24,25 +23,25 @@ allroutes.get('/', (req, res) => {
   console.log("Reached root");
   res.send("Backend home");
 });
+
 allroutes.get('/userIds', async (req, res) => {
   try {
-  
-    const userIds = await userIdModel.find({}, 'userId username');
-
-    
+    const userIds = await userIdModel.find({}, 'userId username name');
     res.json(userIds);
   } catch (error) {
     console.error('Error fetching userIds:', error);
     res.status(500).send('Internal Server Error: Failed to fetch userIds');
   }
 });
+
 allroutes.post('/signup', upload.none(), async (req, res) => {
   try {
     console.log(req.body);
-    const userId = await generateUniqueUserId(); // Generate a unique 4-digit user ID
+    const userId = await generateUniqueUserId();
 
     let newUser = new usersModel({
       userId,
+      name: req.body.name,
       username: req.body.username,
       password: req.body.password,
       userType: req.body.userType
@@ -53,7 +52,8 @@ allroutes.post('/signup', upload.none(), async (req, res) => {
     if (req.body.userType === "patient") {
       let newUserId = new userIdModel({
         username: req.body.username,
-        userId
+        userId,
+        name: req.body.name
       });
       await newUserId.save();
     }
