@@ -19,7 +19,7 @@ const getWeekNumber = () => {
   return Math.ceil(pastDaysOfYear / 7);
 };
 
-const EditableForm = ({selectedPatientId, initialData }) => {
+const EditableForm = ({ selectedPatientId, initialData }) => {
   console.log('EditableForm selectedPatientId:', selectedPatientId);
   const [formData, setFormData] = useState(initialData || {});
   const [isEditing, setIsEditing] = useState(false);
@@ -76,7 +76,7 @@ const EditableForm = ({selectedPatientId, initialData }) => {
                   name={key}
                   value={value}
                   onChange={(e) => handleInputChange(e, currentPath)}
-                  style={{ width: '100%', height: '40px', color: 'black', backgroundColor: '#f0f0f0', border: '1px solid #ccc', borderRadius: '4px', padding: '8px' }}
+                  style={{ width: '100%', height: '40px', color: 'black', border: '1px solid #ccc', borderRadius: '4px', padding: '8px', backgroundColor: 'rgba(220, 220, 220, 0.76)' }}
                 />
               ) : (
                 <div
@@ -84,7 +84,7 @@ const EditableForm = ({selectedPatientId, initialData }) => {
                     width: '100%',
                     height: '40px',
                     color: 'black',
-                    backgroundColor: '#f0f0f0',
+                    backgroundColor: 'rgba(220, 220, 220, 0.76)',
                     border: '1px solid #ccc',
                     borderRadius: '4px',
                     padding: '8px',
@@ -121,7 +121,7 @@ const EditableForm = ({selectedPatientId, initialData }) => {
     try {
       const weekNumber = getWeekNumber();
       const dataToSave = { ...formData, userId: selectedPatientId, week: weekNumber };
-      const response = await axios.post('http://localhost:8080/save', dataToSave);
+      const response = await axios.post('http://localhost:8080/api/save', dataToSave);
       console.log('Save response:', response.data);
       setIsEditing(false);
     } catch (error) {

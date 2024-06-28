@@ -35,7 +35,7 @@ export default function Form() {
     color: 'white',
     textAlign: 'center',
     fontFamily: 'Roboto, sans-serif',
-   backgroundColor: 'rgba(220, 220, 220, 1)',
+   backgroundColor: 'rgba(220, 220, 220, 0.76)',
     maxHeight:'92%',
     marginTop: '8%',
   };

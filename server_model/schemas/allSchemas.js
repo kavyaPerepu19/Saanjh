@@ -1,14 +1,10 @@
 const mongoose = require('mongoose');
 
 let userSchema = new mongoose.Schema({
-  userId: {
+  userId:{
     type: String,
-    required: false,
+    required: true,
     unique: true
-  },
-  name: {
-    type: String,
-    required: true
   },
   username: {
     type: String,
@@ -27,7 +23,7 @@ let userSchema = new mongoose.Schema({
 
 let usersModel = mongoose.model('User', userSchema);
 
-let userIdSchema = new mongoose.Schema({
+let patientIdSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
@@ -44,20 +40,33 @@ let userIdSchema = new mongoose.Schema({
   }
 });
 
-let userIdModel = mongoose.model('UserId', userIdSchema);
+let patientIdModel = mongoose.model('patientId', patientIdSchema);
 
 let reportSchema = new mongoose.Schema({
   userId: { type: String, required: true },
   week: { type: Number, required: true, min: 1, max: 52 },
+  patientData:{
+    type: Object,
+  },
   reportData: {
     type: Object,
-  }
+  },
+  Prediction:{
+    type:String,
+  },
+  DocNote:{
+    type: String,
+  },
+  dietPlan:{
+    type: Object,
+  },
+
 });
 
 let reportsModel = mongoose.model('Report', reportSchema);
 
 module.exports = {
   usersModel,
-  userIdModel,
+  patientIdModel,
   reportsModel
 };

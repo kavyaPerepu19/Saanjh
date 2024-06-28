@@ -7,7 +7,7 @@ const Sign = () => {
     backgroundImage: "url('https://wallpaperaccess.com/full/958470.jpg')",
     backgroundSize: 'cover',
     backgroundPosition: 'center',
-    height: '100vh',
+    height: '120vh',
     position: 'relative',
   };
 
@@ -45,11 +45,7 @@ const Sign = () => {
     e.preventDefault();
     console.log(formObj);
 
-    if (!formObj.userType) {
-      setErrorSigningUp("Please select a user type");
-      return;
-    }
-
+   
     try {
       const resp = await axios.post('http://localhost:8080/api/signup', { ...formObj });
       console.log(resp);
@@ -86,8 +82,8 @@ const Sign = () => {
           <h1 className="mb-4 text-3xl font-extrabold text-primary md:text-5xl lg:text-5xl pb-2 flex items-center">Sign Up</h1>
           <form onSubmit={handleSubmit}>
             {errorSigningUp && <Error />}
-            <div className="mb-3">
-              <label htmlFor="name" className="form-label text-dark">
+            {/* <div className="mb-3"> */}
+              {/* <label htmlFor="name" className="form-label text-dark">
                 Name
               </label>
               <input
@@ -98,10 +94,10 @@ const Sign = () => {
                 value={formObj.name}
                 onChange={changeHandler}
               />
-            </div>
+            </div> */}
             <div className="mb-3">
               <label htmlFor="username" className="form-label text-dark">
-                Email
+                Username
               </label>
               <input
                 type="text"
@@ -124,26 +120,6 @@ const Sign = () => {
                 value={formObj.password}
                 onChange={changeHandler}
               />
-            </div>
-            <div className="mb-3">
-              <label htmlFor="userType" className="form-label text-dark">
-                Select User Type
-              </label>
-              <select
-                className="form-select"
-                id="userType"
-                name="userType"
-                value={formObj.userType}
-                onChange={changeHandler}
-              >
-                <option value="" disabled>
-                  --select--
-                </option>
-                <option value="patient">Patient</option>
-                <option value="management">Management</option>
-                <option value="medicalStaff">Medical Staff</option>
-                <option value="careTakers">Care Takers</option>
-              </select>
             </div>
             <button type="submit" className="mt-3 text-light bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2">
               Submit

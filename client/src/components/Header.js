@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
-const Header = () => {
+const Header = ({ isLoggedIn, handleLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -26,23 +26,34 @@ const Header = () => {
             />
           </Link>
 
-          <div className={`md:flex md:items-center md:space-x-6  ${isOpen ? 'block' : 'hidden'}` }>
+          <div className={`md:flex md:items-center md:space-x-6  ${isOpen ? 'block' : 'hidden'}`}>
             <ul className="flex flex-col md:flex-row md:space-x-4">
-              <li className="nav-item">
-                <Link to="/login" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Login</Link>
-              </li>
-              {/* <li className="nav-item">
-                <Link to="/signup" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Signup</Link>
-              </li> */}
-              <li className="nav-item">
-                <Link to="/profile" className="text-white text-lg mb-2 md:mb-0">Profile</Link>
-              </li>
-              <li className="nav-item">
-                <Link to="/form" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Form</Link>
-              </li>
-              <li className='nav-item'>
-                <Link to="/chatbot" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Chatbot</Link>
-              </li>
+              {!isLoggedIn && (
+                <li className="nav-item">
+                  <Link to="/login" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Login</Link>
+                </li>
+              )}
+              {isLoggedIn && (
+                <li className="nav-item">
+                  <button onClick={handleLogout} className="text-white text-lg mb-2 md:mb-0 md:mr-2">Logout</button>
+                </li>
+              )}
+              {isLoggedIn && (
+                <li className="nav-item">
+                  <Link to="/profile" className="text-white text-lg mb-2 md:mb-0">Profile</Link>
+                </li>
+              )}
+              {isLoggedIn && (
+                <li className="nav-item">
+                  <Link to="/form" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Form</Link>
+                </li>
+              )}
+              {isLoggedIn && (
+                <li className="nav-item">
+                  <Link to="/chatbot" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Chatbot</Link>
+                </li>
+              )}
+              
             </ul>
           </div>
         </div>

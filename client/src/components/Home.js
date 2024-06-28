@@ -33,7 +33,7 @@ const Home = () => {
   const homepageContentStyle = {
     padding: '20px',
     backgroundColor: 'rgba(255, 255, 255, 0.22)', // Slightly transparent background
-    borderRadius: '8px',
+    borderRadius: '10px',
     backdropFilter: 'blur(20px)',
     color: '#333', // Darker color for better visibility
   };
@@ -44,9 +44,9 @@ const Home = () => {
       <div style={contentStyle}>
         <div>
           <div className="homepage-content border rounded-xl bg-transparent p-4 rounded" style={homepageContentStyle}>
-            <h1 className='display-4'>Welcome to Saanjh Elderly Care</h1>
-            <p className='lead' style={{color:'black'}}>Providing the best care for the elderly.</p>
-            <p className='text-black'>Our application helps in tracking health records and predicting disease risks, ensuring a healthier and happier life for the elderly.</p>
+            <h1 className='display-4 text-white'>Welcome to Saanjh Elderly Care</h1>
+            <p className='lead' style={{color:'white'}}>Providing the best care for the elderly.</p>
+            <p className='text-white'>Our application helps in tracking health records and predicting disease risks, ensuring a healthier and happier life for the elderly.</p>
             <div className="features mt-4">
               {/* <h2 className="text-primary">Key Features:</h2>
               <ul className="feature-list">
