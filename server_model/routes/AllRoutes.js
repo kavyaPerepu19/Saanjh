@@ -1,5 +1,5 @@
 const express = require("express");
-const { usersModel, patientIdModel,reportsModel } = require("../schemas/allSchemas");
+const { usersModel, patientIdModel,reportsModel,careIDsModel } = require("../schemas/allSchemas");
 const allroutes = express.Router();
 const multer = require("multer");
 const upload = multer();
@@ -26,7 +26,7 @@ allroutes.get('/', (req, res) => {
 
 allroutes.get('/userIds', async (req, res) => {
   try {
-    const userIds = await patientIdModel.find({}, 'userId username name');
+    const userIds = await patientIdModel.find({}, 'userId  name');
     res.json(userIds);
   } catch (error) {
     console.error('Error fetching userIds:', error);
@@ -72,6 +72,63 @@ allroutes.get('/allreports', async (req, res) => {
 }
 );
 
+allroutes.post('/addpatient', upload.none(), async (req, res) => {
+  try {
+    console.log(req.body);
+    const userId = await generateUniqueUserId();
+
+    // Ensure all required fields are present in the request
+    const { name, age, gender } = req.body;
+    if (!name || !age || !gender) {
+      return res.status(400).send('Missing required fields: name, age, gender');
+    }
+
+    // Fetch all caretakers
+    const caretakers = await careIDsModel.find({});
+
+    if (caretakers.length === 0) {
+      throw new Error('No caretakers available');
+    }
+
+    // Find the caretaker with the fewest patients
+    let minLength = Infinity;
+    let assignedCaretaker = null;
+
+    caretakers.forEach(caretaker => {
+      if (caretaker.patientIds.length < minLength) {
+        minLength = caretaker.patientIds.length;
+        assignedCaretaker = caretaker;
+      }
+    });
+
+    if (!assignedCaretaker) {
+      throw new Error('Unable to find a caretaker with minimum patients');
+    }
+
+    // Create a new patient
+    let newPatient = new patientIdModel({
+      userId,
+      name: req.body.name,
+      age: req.body.age,
+      gender: req.body.gender,
+      caretakerId: assignedCaretaker.userId
+    });
+
+    let patientFromDB = await newPatient.save();
+
+    // Update the caretaker's patientIds array
+    assignedCaretaker.patientIds.push(userId);
+    await assignedCaretaker.save();
+
+    console.log(patientFromDB);
+    res.send(patientFromDB);
+  } catch (err) {
+    console.log("Error while adding patient. Check if it is duplicate.");
+    console.log(err);
+    res.status(500).send(err);
+  }
+});
+
 
 allroutes.post('/signup', upload.none(), async (req, res) => {
   try {
@@ -86,11 +143,17 @@ allroutes.post('/signup', upload.none(), async (req, res) => {
     });
 
     let userFromDB = await newUser.save();
-    
 
-   
+    let newCareTaker = new careIDsModel({
+      userId,
+      patientIds: []
+    });
+
+    let careTakerFromDB = await newCareTaker.save();
 
     console.log(userFromDB);
+    console.log(careTakerFromDB);
+
     res.send(userFromDB);
   } catch (err) {
     console.log("Error while adding user. Check if it is duplicate.");

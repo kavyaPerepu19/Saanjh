@@ -32,9 +32,10 @@ const Sign = () => {
     fontFamily: 'Roboto, sans-serif',
   };
 
-  const [formObj, setFormObj] = useState({ name: "", username: "", password: "", userType: "" });
+  const [formObj, setFormObj] = useState({ username: "", password: "" });
   const [signedUp, setSignedUp] = useState(false);
   const [errorSigningUp, setErrorSigningUp] = useState('');
+  const [userId, setUserId] = useState('');
   const navigate = useNavigate();
 
   const changeHandler = (e) => {
@@ -45,11 +46,11 @@ const Sign = () => {
     e.preventDefault();
     console.log(formObj);
 
-   
     try {
       const resp = await axios.post('http://localhost:8080/api/signup', { ...formObj });
       console.log(resp);
       if (resp.data) {
+        setUserId(resp.data.userId);
         setSignedUp(true);
         setErrorSigningUp('');
         console.log("Successfully signed up");
@@ -82,19 +83,6 @@ const Sign = () => {
           <h1 className="mb-4 text-3xl font-extrabold text-primary md:text-5xl lg:text-5xl pb-2 flex items-center">Sign Up</h1>
           <form onSubmit={handleSubmit}>
             {errorSigningUp && <Error />}
-            {/* <div className="mb-3"> */}
-              {/* <label htmlFor="name" className="form-label text-dark">
-                Name
-              </label>
-              <input
-                type="text"
-                className="form-control form-control-sm"
-                id="name"
-                name="name"
-                value={formObj.name}
-                onChange={changeHandler}
-              />
-            </div> */}
             <div className="mb-3">
               <label htmlFor="username" className="form-label text-dark">
                 Username
@@ -125,7 +113,7 @@ const Sign = () => {
               Submit
             </button>
           </form>
-          {signedUp && <div className="alert alert-success mt-3">Successfully signed up! Redirecting to login...</div>}
+          {signedUp && <div className="alert alert-success mt-3">Successfully signed up! Your user ID is {userId}. Redirecting to login...</div>}
         </div>
       </div>
     </div>

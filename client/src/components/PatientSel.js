@@ -13,6 +13,7 @@ const PatientSel = ({ onSelectPatient }) => {
     try {
       const response = await axios.get('http://localhost:8080/api/userIds');
       setPatientIds(response.data); 
+      console.log(patientIds);
     } catch (error) {
       console.error('Error fetching patient IDs:', error);
     }

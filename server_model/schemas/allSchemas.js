@@ -24,11 +24,6 @@ let userSchema = new mongoose.Schema({
 let usersModel = mongoose.model('User', userSchema);
 
 let patientIdSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true
-  },
   userId: {
     type: String,
     required: true,
@@ -37,7 +32,20 @@ let patientIdSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true
-  }
+  },
+  age:{
+    type: Number,
+    required: true,
+  },
+  gender:{
+    type: String,
+    required: true,
+  },
+  caretakerId:{
+    type: String,
+    required: true,
+  },
+ 
 });
 
 let patientIdModel = mongoose.model('patientId', patientIdSchema);
@@ -65,8 +73,23 @@ let reportSchema = new mongoose.Schema({
 
 let reportsModel = mongoose.model('Report', reportSchema);
 
+let careIDSchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  patientIds: {
+    type: [String],
+    required: true
+  }
+});
+
+let careIDsModel = mongoose.model('CareID', careIDSchema);
+
 module.exports = {
   usersModel,
   patientIdModel,
-  reportsModel
+  reportsModel,
+  careIDsModel
 };
