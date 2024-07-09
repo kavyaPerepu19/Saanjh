@@ -29,11 +29,12 @@ const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
 // Chatbot endpoint
 app.post('/diagnose', async (req, res) => {
-  const { prompt } = req.body;
+  let { prompt } = req.body;
   if (!prompt) {
     return res.status(400).send("Prompt is required");
   }
   try {
+    prompt= prompt + "Your rsponse should consist of 2 parts. The first part is the disease/ diagnosis you made, justification for it with heading Predicted disease: and second part is the risk of the person classify as low, medium or high risk  with heading Risk Prediction: and give a percentage for risk and do not give any other text";
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -66,7 +67,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   
     try {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const prompt = `${extractedText} Generate a nested dictionary from the text where first give the patient details then give a dictionary where the primary keys are test categories (e.g., Blood Group, CBC) and each category contains a dictionary of test names as keys and their values as the test result along with their units as a single string without the range. ignore non whitespaces`;
+      const prompt = `${extractedText} Generate a nested dictionary from the text  then give a dictionary where the primary keys are Patient Details,test categories (e.g., Blood Group, CBC) and each category contains a dictionary of test names as keys and their values as the test result along with their units as a single string without the range. ignore non whitespaces and give correct json format`;
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const generatedText = response.text();

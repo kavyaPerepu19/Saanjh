@@ -8,6 +8,7 @@ import Profile from './components/Profile';
 import Sign from './components/Sign';
 import ChatBot from './components/ChatBot';
 import './App.css';
+import Admin from './components/Admin';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -36,6 +37,7 @@ const App = () => {
         <Route path='/profile' element={<Profile />} />
         <Route path='/signup' element={<Sign />} />
         <Route path='/chatbot' element={<ChatBot />} />
+        <Route path='/admin' element={<Admin/>}></Route>
       </Routes>
     </div>
   );

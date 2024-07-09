@@ -38,8 +38,8 @@ const Header = ({ isLoggedIn, handleLogout }) => {
                   <button onClick={handleLogout} className="text-white text-lg mb-2 md:mb-0 md:mr-2">Logout</button>
                 </li>
               )}
-              {isLoggedIn && (
-                <li className="nav-item">
+              
+              {isLoggedIn && (  <li className="nav-item">
                   <Link to="/profile" className="text-white text-lg mb-2 md:mb-0">Profile</Link>
                 </li>
               )}

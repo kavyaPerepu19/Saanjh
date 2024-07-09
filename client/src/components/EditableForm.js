@@ -192,7 +192,7 @@ const EditableForm = ({ selectedPatientId, initialData }) => {
             padding: '20px',
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
             backgroundColor: 'rgba(220, 220, 220, 0.76)',
-            textAlign: 'center'
+            
           }
         }}
       >

@@ -20,7 +20,7 @@ export default function Form() {
     left: 0,
     bottom: 0,
     width: '100%',
-    height: '400vh',
+    height: '100%',
     backdropFilter: 'blur(6px)',
     zIndex: 0,
      overflowY: 'auto'

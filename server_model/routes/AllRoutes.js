@@ -34,19 +34,25 @@ allroutes.get('/userIds', async (req, res) => {
   }
 });
 
-allroutes.get('/reports/:userId', async (req, res) => {
-  const { userId } = req.params;
+allroutes.get('/userReports', async (req, res) => {
+  const { userId } = req.query;
   console.log('Fetching reports for userId:', userId);
+
+  if (!userId) {
+    return res.status(400).send('userId parameter is required');
+  }
 
   try {
     const reports = await reportsModel.find({ userId });
+    console.log('Reports found:', reports); // Log the reports fetched
     res.json(reports);
   } catch (error) {
     console.error('Error fetching reports:', error);
     res.status(500).send('Internal Server Error: Failed to fetch reports');
   }
-}
-);
+});
+
+
 
 allroutes.get('/reports/:userId/:week', async (req, res) => {
   const { userId, week } = req.params;
@@ -184,20 +190,36 @@ allroutes.post('/login', upload.none(), async (req, res) => {
 
 
 allroutes.post("/save", async (req, res) => {
-  const { userId, week, ...reportData } = req.body;
-  const  Prediction = "";
+  const { userId, week, ...AllData } = req.body;
+  let PD = AllData['Patient Details'];
+  if (!PD) {
+    PD = {
+      'Name': AllData['Patient Information'].Name,
+      'Sex/Age': AllData['Patient Information']['Sex/Age'],
+      'Blood Group': AllData['Blood Group']
+    };
+    delete AllData['Patient Information'];
+  }
+  delete AllData['Patient Details'];
+  delete AllData['Blood Group'];
+  
+  const patientData = PD;
+  const reportData = AllData;
+  const Prediction = "";
   const DocNote = "";
   const dietPlan = "";
-  console.log('Received data to save:', req.body);
 
-  if (!userId || !week || !reportData) {
+  if (!userId || !week || !AllData) {
     return res.status(400).send("User ID, week number, and report data are required");
   }
 
   try {
-    const report = new reportsModel({ userId, week, reportData ,Prediction,DocNote,dietPlan});
-    await report.save();
-    res.send({ success: true, message: "Data saved successfully" });
+    const updatedReport = await reportsModel.findOneAndUpdate(
+      { userId, week },
+      { patientData, reportData, Prediction, DocNote, dietPlan },
+      { upsert: true, new: true }
+    );
+    res.send({ success: true, message: "Data saved successfully", report: updatedReport });
   } catch (error) {
     console.error('Error saving data:', error);
     res.status(500).send('Internal Server Error: Failed to save data');
