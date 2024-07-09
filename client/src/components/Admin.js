@@ -60,26 +60,22 @@ const Admin = () => {
   const contentStyle = {
     zIndex: 1,
     position: 'absolute',
-    top: '40%',
+    top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    color: 'white',
+    color: 'black',
     textAlign: 'center',
     fontFamily: 'Roboto, sans-serif',
     backgroundColor: 'rgba(220, 220, 220, 0.76)',
-    maxHeight: '92%',
-    marginTop: '8%',
+    padding: '2rem',
+    borderRadius: '8px',
+    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+    width: '100%',
+    maxWidth: '500px',
+    overflowY: 'auto',
   };
 
   const styles = {
-    adminContainer: {
-      backgroundColor: '#fff',
-      padding: '2rem',
-      borderRadius: '8px',
-      boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-      width: '100%',
-      maxWidth: '500px',
-    },
     formGroup: {
       marginBottom: '1rem',
     },
@@ -125,61 +121,59 @@ const Admin = () => {
     <div style={backgroundStyle}>
       <div style={blurOverlayStyle}></div>
       <div style={contentStyle}>
-        <div style={styles.adminContainer}>
-          <h2 style={styles.h2}>Admin Register</h2>
-          {notification.message && (
-            <div style={{ ...styles.notification, ...(notification.type === 'success' ? styles.success : styles.error) }}>
-              {notification.message}
-            </div>
-          )}
-          {userId && (
-            <div style={{ ...styles.notification, ...styles.success }}>
-              User ID: {userId}
-            </div>
-          )}
-          <form onSubmit={handleSubmit}>
-            <div style={styles.formGroup}>
-              <label style={styles.formLabel} htmlFor="formName">Name</label>
-              <input
-                className='text-dark'
-                id="formName"
-                type="text"
-                placeholder="Enter name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                style={styles.formControl}
-              />
-            </div>
-            <div style={styles.formGroup}>
-              <label style={styles.formLabel} htmlFor="formAge">Age</label>
-              <input
-                className='text-dark'
-                id="formAge"
-                type="number"
-                placeholder="Enter age"
-                value={age}
-                onChange={(e) => setAge(e.target.value)}
-                required
-                style={styles.formControl}
-              />
-            </div>
-            <div style={styles.formGroup}>
-              <label style={styles.formLabel} htmlFor="formGender">Gender</label>
-              <input
-                className='text-dark'
-                id="formGender"
-                type="text"
-                placeholder="Enter gender"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                required
-                style={styles.formControl}
-              />
-            </div>
-            <button type="submit" style={styles.button}>Add Patient</button>
-          </form>
-        </div>
+        <h2 style={styles.h2}>Admin Register</h2>
+        {notification.message && (
+          <div style={{ ...styles.notification, ...(notification.type === 'success' ? styles.success : styles.error) }}>
+            {notification.message}
+          </div>
+        )}
+        {userId && (
+          <div style={{ ...styles.notification, ...styles.success }}>
+            User ID: {userId}
+          </div>
+        )}
+        <form onSubmit={handleSubmit}>
+          <div style={styles.formGroup}>
+            <label style={styles.formLabel} htmlFor="formName">Name</label>
+            <input
+              className='text-dark'
+              id="formName"
+              type="text"
+              placeholder="Enter name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              style={styles.formControl}
+            />
+          </div>
+          <div style={styles.formGroup}>
+            <label style={styles.formLabel} htmlFor="formAge">Age</label>
+            <input
+              className='text-dark'
+              id="formAge"
+              type="number"
+              placeholder="Enter age"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              required
+              style={styles.formControl}
+            />
+          </div>
+          <div style={styles.formGroup}>
+            <label style={styles.formLabel} htmlFor="formGender">Gender</label>
+            <input
+              className='text-dark'
+              id="formGender"
+              type="text"
+              placeholder="Enter gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              required
+              style={styles.formControl}
+            />
+          </div>
+          <button type="submit" style={styles.button}>Add Patient</button>
+        </form>
       </div>
     </div>
   );
