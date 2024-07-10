@@ -5,7 +5,7 @@ import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import "./ChatBot.css";
 const makeRequestAPI = async (prompt) => {
-  const res = await axios.post("http://localhost:8080/diagnose", { prompt });
+  const res = await axios.post("http://localhost:8080/chatbot", { prompt });
   return res.data;
 };
 

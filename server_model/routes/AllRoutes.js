@@ -1,5 +1,5 @@
 const express = require("express");
-const { usersModel, patientIdModel,reportsModel,careIDsModel } = require("../schemas/allSchemas");
+const { usersModel, patientIdModel,reportIdsModel,careIDsModel,reportDatasModel, } = require("../schemas/allSchemas");
 const allroutes = express.Router();
 const multer = require("multer");
 const upload = multer();
@@ -34,49 +34,6 @@ allroutes.get('/userIds', async (req, res) => {
   }
 });
 
-allroutes.get('/userReports', async (req, res) => {
-  const { userId } = req.query;
-  console.log('Fetching reports for userId:', userId);
-
-  if (!userId) {
-    return res.status(400).send('userId parameter is required');
-  }
-
-  try {
-    const reports = await reportsModel.find({ userId });
-    console.log('Reports found:', reports); // Log the reports fetched
-    res.json(reports);
-  } catch (error) {
-    console.error('Error fetching reports:', error);
-    res.status(500).send('Internal Server Error: Failed to fetch reports');
-  }
-});
-
-
-
-allroutes.get('/reports/:userId/:week', async (req, res) => {
-  const { userId, week } = req.params;
-  console.log('Fetching reports for userId:', userId, 'week:', week);
-  try {
-    const report = await reportsModel.find({ userId, week });
-    res.json(report);
-  } catch (error) {
-    console.error('Error fetching reports:', error);
-    res.status(500).send('Internal Server Error: Failed to fetch reports');
-  }
-}
-);
-
-allroutes.get('/allreports', async (req, res) => {
-  try {
-    const reports = await reportsModel.find({});
-    res.json(reports);
-  } catch (error) {
-    console.error('Error fetching reports:', error);
-    res.status(500).send('Internal Server Error: Failed to fetch reports');
-  }
-}
-);
 
 allroutes.post('/addpatient', upload.none(), async (req, res) => {
   try {
@@ -121,12 +78,17 @@ allroutes.post('/addpatient', upload.none(), async (req, res) => {
     });
 
     let patientFromDB = await newPatient.save();
-
+    let newReportId = new reportIdsModel({
+      userId,
+      ALLreportIDs:[],
+      PredictionID:[]
+    })
+    let ReportIdfromDb = await newReportId.save();
     // Update the caretaker's patientIds array
     assignedCaretaker.patientIds.push(userId);
     await assignedCaretaker.save();
 
-    console.log(patientFromDB);
+    console.log(patientFromDB,ReportIdfromDb);
     res.send(patientFromDB);
   } catch (err) {
     console.log("Error while adding patient. Check if it is duplicate.");
@@ -190,36 +152,38 @@ allroutes.post('/login', upload.none(), async (req, res) => {
 
 
 allroutes.post("/save", async (req, res) => {
-  const { userId, week, ...AllData } = req.body;
-  let PD = AllData['Patient Details'];
-  if (!PD) {
-    PD = {
-      'Name': AllData['Patient Information'].Name,
-      'Sex/Age': AllData['Patient Information']['Sex/Age'],
-      'Blood Group': AllData['Blood Group']
-    };
-    delete AllData['Patient Information'];
-  }
-  delete AllData['Patient Details'];
-  delete AllData['Blood Group'];
+  const { userId, date, ...AllData } = req.body;
   
-  const patientData = PD;
   const reportData = AllData;
-  const Prediction = "";
   const DocNote = "";
   const dietPlan = "";
+  const week = ""; // Ensure the 'week' value is passed in the request body or modify accordingly.
 
-  if (!userId || !week || !AllData) {
+  if (!userId || !date || !AllData) {
     return res.status(400).send("User ID, week number, and report data are required");
   }
 
   try {
-    const updatedReport = await reportsModel.findOneAndUpdate(
-      { userId, week },
-      { patientData, reportData, Prediction, DocNote, dietPlan },
+    // Create new reportData object
+    const newReportData = new reportDatasModel({
+      userId,
+      date,
+      reportPdf: reportData,
+      docNote: DocNote,
+      dietPlan: dietPlan,
+    });
+    
+    // Save the new reportData object
+    const savedReportData = await newReportData.save();
+
+    // Update reportIdsModel with new reportData object ID
+    const updatedReportIds = await reportIdsModel.findOneAndUpdate(
+      { userId },
+      { $push: { ALLreportIDs: savedReportData._id } },
       { upsert: true, new: true }
     );
-    res.send({ success: true, message: "Data saved successfully", report: updatedReport });
+
+    res.send({ success: true, message: "Data saved successfully", report: savedReportData, reportIds: updatedReportIds });
   } catch (error) {
     console.error('Error saving data:', error);
     res.status(500).send('Internal Server Error: Failed to save data');

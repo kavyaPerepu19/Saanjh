@@ -50,29 +50,59 @@ let patientIdSchema = new mongoose.Schema({
 
 let patientIdModel = mongoose.model('patientId', patientIdSchema);
 
-let reportSchema = new mongoose.Schema({
-  userId: { type: String, required: true },
-  week: { type: Number, required: true, min: 1, max: 52 },
-  patientData:{
-    type: Object,
+let reportIdSchema = new mongoose.Schema({
+  userId: { type: String, required: true },  
+  ALLreportIDs: {
+    type: Array,
   },
-  reportData: {
-    type: Object,
+  PredictionID:{
+    type:Array,
   },
-  Prediction:{
-    type:String,
-  },
-  DocNote:{
-    type: String,
-  },
-  dietPlan:{
-    type: Object,
-  },
+  
 
 });
 
-let reportsModel = mongoose.model('Report', reportSchema);
+let reportIdsModel = mongoose.model('ReportId', reportIdSchema);
 
+let reportDataSchema = new mongoose.Schema({
+  userId:{
+    type:String
+  },
+  date:{
+    type:String
+  },
+  reportPdf:{
+    type:Object
+  },
+  docNote:{
+    type:String
+  }
+  ,
+  dietPlan:{
+    type:String
+  }
+})
+let reportDatasModel=mongoose.model('reportData',reportDataSchema);
+let PredictionSchema= new mongoose.Schema({
+  predictionId:{
+    type:String,
+  },
+  userId:
+  {
+    type:String
+  },
+  reportIds:{
+    type:Array,
+  }
+  ,
+  LLMPrediction:{
+    type:String,
+  },
+  riskPercent:{
+  type: Number
+  }
+})
+let predictionsModel= mongoose.model('Prediction',PredictionSchema);
 let careIDSchema = new mongoose.Schema({
   userId: {
     type: String,
@@ -90,6 +120,8 @@ let careIDsModel = mongoose.model('CareID', careIDSchema);
 module.exports = {
   usersModel,
   patientIdModel,
-  reportsModel,
-  careIDsModel
+  reportIdsModel,
+  reportDatasModel,
+  careIDsModel,
+  predictionsModel,
 };

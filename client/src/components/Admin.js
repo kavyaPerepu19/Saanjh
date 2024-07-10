@@ -60,7 +60,7 @@ const Admin = () => {
   const contentStyle = {
     zIndex: 1,
     position: 'absolute',
-    top: '50%',
+    top: '56%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     color: 'black',

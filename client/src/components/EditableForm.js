@@ -3,9 +3,9 @@ import axios from 'axios';
 import { useMutation } from '@tanstack/react-query';
 import Modal from 'react-modal';
 
-const makeRequestAPI = async (prompt) => {
+const makeRequestAPI = async (prompt,selectedPatientId) => {
   try {
-    const response = await axios.post('http://localhost:8080/diagnose', { prompt });
+    const response = await axios.post('http://localhost:8080/predict', { prompt ,userId: "6961"});
     return response.data;
   } catch (error) {
     throw new Error(`Error in makeRequestAPI: ${error.message}`);
@@ -14,9 +14,7 @@ const makeRequestAPI = async (prompt) => {
 
 const getWeekNumber = () => {
   const currentDate = new Date();
-  const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
-  const pastDaysOfYear = (currentDate - startOfYear) / 86400000 + 1;
-  return Math.ceil(pastDaysOfYear / 7);
+  return currentDate;
 };
 
 const EditableForm = ({ selectedPatientId, initialData }) => {
@@ -120,7 +118,7 @@ const EditableForm = ({ selectedPatientId, initialData }) => {
   const handleSave = async () => {
     try {
       const weekNumber = getWeekNumber();
-      const dataToSave = { ...formData, userId: selectedPatientId, week: weekNumber };
+      const dataToSave = { ...formData, userId: selectedPatientId, date: weekNumber };
       const response = await axios.post('http://localhost:8080/api/save', dataToSave);
       console.log('Save response:', response.data);
       setIsEditing(false);

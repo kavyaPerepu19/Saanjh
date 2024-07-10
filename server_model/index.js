@@ -3,7 +3,7 @@ const https = require('https');
 const app = express();
 const allroutes = require('./routes/AllRoutes');
 const mongoose = require('mongoose');
-
+const {predictionsModel,reportIdsModel,reportDatasModel}=require("./schemas/allSchemas");
 const cors = require('cors');
 const dotenv = require("dotenv");
 dotenv.config();
@@ -27,14 +27,65 @@ app.use(cors());
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
-// Chatbot endpoint
-app.post('/diagnose', async (req, res) => {
-  let { prompt } = req.body;
+
+app.post('/predict', async (req, res) => {
+  const { prompt, userId } = req.body;
+
+  if (!prompt || !userId) {
+    return res.status(400).send("Both prompt and userId are required");
+  }
+
+  try {
+    // Fetch reportIds for the user
+    const reportIdsData = await reportIdsModel.findOne({ userId });
+    const reportIds = reportIdsData ? reportIdsData.ALLreportIDs : [];
+
+    // Fetch the last three report data
+    const lastThreeReportIds = reportIds.slice(-3);
+    const reportData = await reportDatasModel.find({ _id: { $in: lastThreeReportIds } });
+
+    const promptWithReports = {
+      prompt: prompt + " Your response should consist of 2 parts. The first part is the disease/diagnosis you made, justification for it with heading Predicted disease: and second part is the risk of the person classify as low, medium or high risk with heading Risk Prediction: and give a percentage for risk and do not give any other text",
+      reports: reportData
+    };
+
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(JSON.stringify(promptWithReports));
+    const response = await result.response;
+    const text = await response.text();
+
+    const newPrediction = new predictionsModel({
+      userId,
+      prediction: text,
+  
+    });
+
+    const savedPrediction = await newPrediction.save();
+
+    await reportIdsModel.findOneAndUpdate(
+      { userId },
+      { $push: { ALLreportIDs: savedPrediction._id } },
+      { upsert: true, new: true }
+    );
+
+    res.send({
+      success: true,
+      message: "Prediction generated and saved successfully",
+      prediction: text,
+      reportData
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Failed to generate content");
+  }
+});
+
+app.post('/chatbot',async(req,re)=>{
+  let {prompt} = req.body;
   if (!prompt) {
     return res.status(400).send("Prompt is required");
   }
-  try {
-    prompt= prompt + "Your rsponse should consist of 2 parts. The first part is the disease/ diagnosis you made, justification for it with heading Predicted disease: and second part is the risk of the person classify as low, medium or high risk  with heading Risk Prediction: and give a percentage for risk and do not give any other text";
+  try{
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const result = await model.generateContent(prompt);
     const response = await result.response;
@@ -44,8 +95,8 @@ app.post('/diagnose', async (req, res) => {
     console.log(error);
     res.status(500).send("Failed to generate content");
   }
-});
 
+})
 app.post('/upload', upload.single('file'), async (req, res) => {
   if (!req.file) {
     return res.status(400).send('No file uploaded');
