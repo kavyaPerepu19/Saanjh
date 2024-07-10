@@ -29,7 +29,7 @@ const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
 
 app.post('/diagnose', async (req, res) => {
-  let { prompt } = req.body;
+  let { prompt}  = "req.body";
   if (!prompt) {
     return res.status(400).send("Prompt is required");
   }
@@ -45,6 +45,106 @@ app.post('/diagnose', async (req, res) => {
     res.status(500).send("Failed to generate content");
   }
 });
+
+
+app.post('/predict', async (req, res) => {
+  const { userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).send({ error: 'userId is required' });
+  }
+
+  try {
+    // Find the reportIds object for the user
+    const reportIds = await reportIdsModel.findOne({ userId });
+
+    if (!reportIds || !reportIds.ALLreportIDs || reportIds.ALLreportIDs.length === 0) {
+      return res.status(404).send({ error: 'No reports found for the user' });
+    }
+
+    // Retrieve the last three report IDs
+    const lastThreeReportIds = reportIds.ALLreportIDs.slice(-3);
+
+    // Fetch the last three reports' data
+    const reportsDataPromises = lastThreeReportIds.map(reportId =>
+      reportDatasModel.findOne({ userId, _id: reportId }).then(report => {
+        if (!report || !report.reportPdf) {
+          console.log(`Report ${reportId} is missing reportPdf data`);
+          return null;
+        }
+        
+        // Convert the reportPdf object to a string
+        let reportText = JSON.stringify(report.reportPdf, null, 2);
+        return reportText;
+      })
+    );
+
+    const reportsTexts = await Promise.all(reportsDataPromises);
+
+    // Filter out null values
+    const validReportsTexts = reportsTexts.filter(text => text !== null);
+
+    if (validReportsTexts.length === 0) {
+      return res.status(404).send({ error: 'No valid reports found for the user' });
+    }
+
+    // Prepare data for Gemini
+    let prompt = 'Analyze the following medical reports and provide your predictions. Reports:\n';
+    validReportsTexts.forEach((text, index) => {
+      prompt += `Report ${index + 1}:\n${text}\n`;
+    });
+    prompt += " Your response should consist of 2 parts. The first part is the disease/diagnosis you made, justification for it with heading Predicted disease: and the second part is the risk of the person classified as low, medium, or high risk with the heading Risk Prediction: followed by a percentage for risk. Do not include any other text.";
+
+    // Send data to Gemini for prediction
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = await response.text();
+
+    // Log the response text for debugging
+    console.log('Gemini API response:', text);
+
+    // Extract the prediction details from the response text
+    const [predictedDisease, riskPrediction] = text.split('Risk Prediction:');
+
+    // Check if the response contains the expected parts
+    if (!predictedDisease || !riskPrediction) {
+      return res.status(500).send({ error: 'Invalid response format from Gemini API' });
+    }
+
+    const [diseaseHeading, disease] = predictedDisease.split('Predicted disease:');
+
+    // Extract the numeric risk percentage
+    const riskPercentMatch = riskPrediction.match(/(\d+)%/);
+    const riskPercent = riskPercentMatch ? parseInt(riskPercentMatch[1], 10) : null;
+
+    if (riskPercent === null) {
+      return res.status(500).send({ error: 'Invalid risk percentage format from Gemini API' });
+    }
+
+    // Save the prediction in the database
+    const newPrediction = new predictionsModel({
+      predictionId: new mongoose.Types.ObjectId().toString(),
+      userId,
+      reportIds: lastThreeReportIds,
+      LLMPrediction: disease ? disease.trim() : 'N/A',
+      riskPercent: riskPercent
+    });
+
+    await newPrediction.save();
+
+    // Send the prediction back to the client
+    res.send(newPrediction);
+
+  } catch (error) {
+    console.error('Error processing prediction:', error);
+    res.status(500).send({ error: error.message });
+  }
+});
+
+
+
+
 
 app.post('/chatbot',async(req,re)=>{
   let {prompt} = req.body;

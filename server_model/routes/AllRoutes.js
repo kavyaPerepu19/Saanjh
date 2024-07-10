@@ -158,6 +158,7 @@ allroutes.post("/save", async (req, res) => {
   const DocNote = "";
   const dietPlan = "";
   const week = ""; // Ensure the 'week' value is passed in the request body or modify accordingly.
+  delete reportData['Patient Details'];
 
   if (!userId || !date || !AllData) {
     return res.status(400).send("User ID, week number, and report data are required");
