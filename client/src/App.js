@@ -9,6 +9,7 @@ import Sign from './components/Sign';
 import ChatBot from './components/ChatBot';
 import './App.css';
 import Admin from './components/Admin';
+import AddCare from './components/AddCare';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -23,6 +24,7 @@ const App = () => {
 
   const handleLogout = () => {
     sessionStorage.removeItem('isLoggedIn');
+    sessionStorage.removeItem('userType');
     setIsLoggedIn(false);
     navigate('/login');
   };
@@ -33,11 +35,12 @@ const App = () => {
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} />} />
-        <Route path='/form' element={<Form />} />
+        <Route path='/form' element={isLoggedIn && sessionStorage.getItem('userType') === 'Care Taker' ? <Form /> : <Home />} />
         <Route path='/profile' element={<Profile />} />
         <Route path='/signup' element={<Sign />} />
-        <Route path='/chatbot' element={<ChatBot />} />
-        <Route path='/admin' element={<Admin/>}></Route>
+        <Route path='/chatbot' element={isLoggedIn && sessionStorage.getItem('userType') === 'doctor' ? <ChatBot /> : <Home />} />
+        <Route path='/admin' element={isLoggedIn && sessionStorage.getItem('userType') === 'admin' ? <Admin /> : <Home />} />
+        <Route path='/addcare' element={isLoggedIn && sessionStorage.getItem('userType') === 'admin' ? <AddCare></AddCare> : <Home />} />
       </Routes>
     </div>
   );

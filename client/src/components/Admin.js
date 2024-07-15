@@ -27,6 +27,12 @@ const Admin = () => {
         setName('');
         setAge('');
         setGender('');
+
+        setTimeout(() => {
+          setNotification({ message: '', type: '' });
+          setUserId('');
+        }, 2000); // Reset notification after 5000ms
+
       } else {
         setNotification({ message: `Failed to add patient: ${responseData.error}`, type: 'error' });
       }

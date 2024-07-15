@@ -41,7 +41,7 @@ const UploadReport = ({ onReportData }) => {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', margin: '3rem',backgroundColor: 'rgba(220, 220, 220, 0.76)' }} className='border rounded-xl'>
       <div>
-        <input type="file" onChange={handleFileChange} className='text-dark ' />
+        <input type="file"  onChange={handleFileChange} className='text-dark' />
         <div>
           <button
             type="button"

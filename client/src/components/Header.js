@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const Header = ({ isLoggedIn, handleLogout }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  const userType = sessionStorage.getItem('userType');
 
   return (
     <div>
@@ -26,7 +28,8 @@ const Header = ({ isLoggedIn, handleLogout }) => {
             />
           </Link>
 
-          <div className={`md:flex md:items-center md:space-x-6  ${isOpen ? 'block' : 'hidden'}`}>
+
+          <div className={`md:flex md:items-center md:space-x-6 ${isOpen ? 'block' : 'hidden'}`}>
             <ul className="flex flex-col md:flex-row md:space-x-4">
               {!isLoggedIn && (
                 <li className="nav-item">
@@ -38,22 +41,30 @@ const Header = ({ isLoggedIn, handleLogout }) => {
                   <button onClick={handleLogout} className="text-white text-lg mb-2 md:mb-0 md:mr-2">Logout</button>
                 </li>
               )}
-              
-              {/* {isLoggedIn && (  <li className="nav-item">
-                  <Link to="/profile" className="text-white text-lg mb-2 md:mb-0">Profile</Link>
-                </li>
-              )} */}
-              {isLoggedIn && (
+              {isLoggedIn &&  userType==='Care Taker' &&(
                 <li className="nav-item">
                   <Link to="/form" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Form</Link>
                 </li>
               )}
-              {isLoggedIn && (
+              {isLoggedIn && userType === 'doctor' && (
                 <li className="nav-item">
                   <Link to="/chatbot" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Chatbot</Link>
                 </li>
               )}
-              
+
+              {isLoggedIn && userType === 'admin' && (
+                <li className="nav-item">
+                  <Link to="/admin" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Add Patient</Link>
+                </li>
+              )}
+
+
+              {isLoggedIn && userType === 'admin' && (
+                <li className="nav-item">
+                  <Link to="/addcare" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Add Caretaker</Link>
+                </li>
+              )}
+
             </ul>
           </div>
         </div>

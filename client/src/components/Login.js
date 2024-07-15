@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Login = ({ setIsLoggedIn }) => {
   const backgroundStyle = {
@@ -41,6 +41,7 @@ const Login = ({ setIsLoggedIn }) => {
         setLoggedIn(true);
         setErrorLoggingIn('');
         sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('userType', resp.data.user.userType); // Store userType
         setIsLoggedIn(true);
         console.log("Successfully logged in");
         setTimeout(() => {
@@ -98,7 +99,6 @@ const Login = ({ setIsLoggedIn }) => {
                 onChange={changeHandler}
               />
             </div>
-           
             <button type="submit" className="mt-3 text-light bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2">
               Submit
             </button>
