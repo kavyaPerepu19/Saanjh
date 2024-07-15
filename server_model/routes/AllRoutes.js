@@ -133,7 +133,7 @@ allroutes.post('/signup', upload.none(), async (req, res) => {
 allroutes.post('/login', upload.none(), async (req, res) => {
   try {
     console.log(req.body);
-    let user = await usersModel.findOne({ userId: req.body.userId });
+    let user = await usersModel.findOne({ username: req.body.username });
 
     if (!user) {
       return res.status(400).send('Invalid username or password');
@@ -149,7 +149,6 @@ allroutes.post('/login', upload.none(), async (req, res) => {
     res.status(500).send(err);
   }
 });
-
 
 allroutes.post("/save", async (req, res) => {
   const { userId, date, ...AllData } = req.body;

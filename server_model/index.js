@@ -133,6 +133,10 @@ app.post('/predict', async (req, res) => {
 
     await newPrediction.save();
 
+    // Update the reportIdsModel with the new prediction ID
+    reportIds.PredictionID.push(newPrediction.predictionId);
+    await reportIds.save();
+
     // Send the prediction back to the client
     res.send(newPrediction);
 
@@ -146,7 +150,7 @@ app.post('/predict', async (req, res) => {
 
 
 
-app.post('/chatbot',async(req,re)=>{
+app.post('/chatbot',async(req,res)=>{
   let {prompt} = req.body;
   if (!prompt) {
     return res.status(400).send("Prompt is required");
@@ -163,6 +167,8 @@ app.post('/chatbot',async(req,re)=>{
   }
 
 })
+
+
 app.post('/upload', upload.single('file'), async (req, res) => {
   if (!req.file) {
     return res.status(400).send('No file uploaded');
@@ -173,28 +179,21 @@ app.post('/upload', upload.single('file'), async (req, res) => {
   try {
     const dataBuffer = fs.readFileSync(filePath);
     const data = await pdfParse(dataBuffer);
-
-  
     fs.unlinkSync(filePath);
 
-  
     const extractedText = data.text;
     console.log("Extracted Text:", extractedText);
 
-  
     try {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const prompt = `${extractedText} Generate a nested dictionary from the text  then give a dictionary where the primary keys are Patient Details,test categories (e.g., Blood Group, CBC) and each category contains a dictionary of test names as keys and their values as the test result along with their units as a single string without the range. ignore non whitespaces and give correct json format`;
+      const prompt = `${extractedText} Generate a nested dictionary from the text then give a dictionary where the primary keys are Patient Details, test categories (e.g., Blood Group, CBC) and each category contains a dictionary of test names as keys and their values as the test result along with their units as a single string without the range. Ignore non-whitespaces and give correct JSON format.`;
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const generatedText = response.text();
 
       console.log("Generated Text:", generatedText);
 
-      
       let dictionaryString = generatedText.substring(generatedText.indexOf('{'), generatedText.lastIndexOf('}') + 1);
-
-      
       dictionaryString = dictionaryString.replace(/`/g, '').replace(/[\n\r]/g, '').trim();
 
       console.log("Cleaned Dictionary String:", dictionaryString);
@@ -205,7 +204,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
       } catch (parseError) {
         console.log("First parsing error:", parseError);
 
-        
         dictionaryString = dictionaryString.replace(/[^a-zA-Z0-9:{}\[\],\"\' ]/g, '');
         console.log("Further cleaned Dictionary String:", dictionaryString);
 
@@ -240,19 +238,16 @@ app.post('/upload', upload.single('file'), async (req, res) => {
       }
 
       console.log("Generated Dictionary:", dictionary);
-
-
       res.json({ details: dictionary });
+
     } catch (error) {
-      console.log(error);
+      console.log("Error generating content:", error);
       res.status(500).send("Failed to generate content");
     }
+
   } catch (error) {
     console.error("Error processing PDF:", error);
-
-   
     fs.unlinkSync(filePath);
-
     res.status(500).send('Error processing PDF');
   }
 });

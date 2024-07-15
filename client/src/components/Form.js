@@ -35,9 +35,10 @@ export default function Form() {
     color: 'white',
     textAlign: 'center',
     fontFamily: 'Roboto, sans-serif',
-   backgroundColor: 'rgba(220, 220, 220, 0.76)',
+  
     maxHeight:'92%',
     marginTop: '8%',
+    overflowY: 'auto'
   };
 
   const [selectedPatientId, setSelectedPatientId] = useState('');
@@ -59,7 +60,10 @@ export default function Form() {
         {selectedPatientId === '' ? (
           <PatientSel onSelectPatient={handlePatientSelect} />
         ) : reportData ? (
-          <EditableForm initialData={reportData} selectedPatientId={selectedPatientId} />
+          <div>
+          <EditableForm className='my-1'initialData={reportData} selectedPatientId={selectedPatientId} />
+          <br></br>
+          </div>
         ) : (
           <UploadReport selectedPatientId={selectedPatientId} onReportData={handleReportData} />
         )}

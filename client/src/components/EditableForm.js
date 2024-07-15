@@ -1,16 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { useMutation } from '@tanstack/react-query';
-import Modal from 'react-modal';
 
-const makeRequestAPI = async (prompt,selectedPatientId) => {
-  try {
-    const response = await axios.post('http://localhost:8080/predict', { prompt ,userId: "6961"});
-    return response.data;
-  } catch (error) {
-    throw new Error(`Error in makeRequestAPI: ${error.message}`);
-  }
-};
 
 const getWeekNumber = () => {
   const currentDate = new Date();
@@ -22,7 +12,7 @@ const EditableForm = ({ selectedPatientId, initialData }) => {
   const [formData, setFormData] = useState(initialData || {});
   const [isEditing, setIsEditing] = useState(false);
   const [diagnosisReport, setDiagnosisReport] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  
   const reportRef = useRef(null);
 
   useEffect(() => {
@@ -100,21 +90,9 @@ const EditableForm = ({ selectedPatientId, initialData }) => {
     });
   };
 
-  const mutation = useMutation({
-    mutationFn: makeRequestAPI,
-    mutationKey: ['gemini-ai-request'],
-    onSuccess: (data) => {
-      setDiagnosisReport(data.replace(/\*+/g, '').split('\n').map((line, index) => <p key={index}>{line}</p>));
-      setShowModal(true);
-    }
-  });
+ 
 
-  const submitHandler = (e) => {
-    e.preventDefault();
-    const prompt = JSON.stringify(formData);
-    mutation.mutate(prompt);
-  };
-
+ 
   const handleSave = async () => {
     try {
       const weekNumber = getWeekNumber();
@@ -127,10 +105,7 @@ const EditableForm = ({ selectedPatientId, initialData }) => {
     }
   };
 
-  const closeModal = () => {
-    setShowModal(false);
-    setDiagnosisReport(null);
-  };
+  
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', marginTop: '6%' }}>
@@ -159,54 +134,10 @@ const EditableForm = ({ selectedPatientId, initialData }) => {
               onClick={handleSave}>Save</button>}
         </div>
 
-        {!isEditing &&
-          <form onSubmit={submitHandler} className='flex justify-center'>
-            <button
-              type="submit"
-              className="mt-3 mb-5 text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2"
-            >
-              Diagnose
-            </button>
-          </form>
-        }
 
-        {mutation.isPending && <p className='text-5xl'>Generating your content</p>}
-        {mutation.isError && <p>{mutation.error.message}</p>}
       </div>
 
-      <Modal
-        isOpen={showModal}
-        onRequestClose={closeModal}
-        style={{
-          overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            zIndex: 1000
-          },
-          content: {
-            maxWidth: '600px',
-            margin: 'auto',
-            border: '1px solid #ccc',
-            borderRadius: '10px',
-            padding: '20px',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-            backgroundColor: 'rgba(220, 220, 220, 0.76)',
-            
-          }
-        }}
-      >
-        <h2 className='text-2xl font-bold text-dark-800 mb-2'>Diagnosis Report</h2>
-        {diagnosisReport && (
-          <div className='border border-gray-300 p-4 rounded-md text-dark'>
-            {diagnosisReport}
-          </div>
-        )}
-        <button
-          onClick={closeModal}
-          className='mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg focus:outline-none'
-        >
-          Close
-        </button>
-      </Modal>
+       
     </div>
   );
 };

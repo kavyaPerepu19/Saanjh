@@ -29,7 +29,7 @@ const PatientSel = ({ onSelectPatient }) => {
   };
 
   return (
-    <div className="p-4 flex justify-center items-center min-h-screen">
+    <div className="p-4 flex justify-center items-center min-h-screen rounded-xl" style={{ backgroundColor: 'rgba(220, 220, 220, 0.76)'}}>
       <div className="w-full max-w-md">
         <h2 className="mb-4 text-3xl font-extrabold text-primary text-center md:text-5xl lg:text-5xl pb-2">Upload Data</h2>
         <form onSubmit={handleSubmit} className="shadow-md rounded px-8 pt-6 pb-8 mb-4">

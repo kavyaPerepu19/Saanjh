@@ -39,10 +39,10 @@ const Header = ({ isLoggedIn, handleLogout }) => {
                 </li>
               )}
               
-              {isLoggedIn && (  <li className="nav-item">
+              {/* {isLoggedIn && (  <li className="nav-item">
                   <Link to="/profile" className="text-white text-lg mb-2 md:mb-0">Profile</Link>
                 </li>
-              )}
+              )} */}
               {isLoggedIn && (
                 <li className="nav-item">
                   <Link to="/form" className="text-white text-lg mb-2 md:mb-0 md:mr-2">Form</Link>
