@@ -1,0 +1,72 @@
+.admin-page {
+    /*position: relative;
+    height: 100vh;*/
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .background-image {
+    /*position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('https://res.cloudinary.com/dsfgf7eb7/image/upload/v1718718836/Caregivers-vs-Caretakers_w8rd17.webp') no-repeat center center;
+    background-size: cover;
+    z-index: -1;*/
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://res.cloudinary.com/dsfgf7eb7/image/upload/v1718718836/Caregivers-vs-Caretakers_w8rd17.webp') no-repeat center center/cover;
+    filter: blur(10px);
+    z-index: 1;
+  }
+  
+  .admin-container {
+    /*display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;*/
+    position: relative;
+    z-index: 2;
+  }
+  
+  .admin-card {
+    /*background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);*/
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+  }
+  .admin-card h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .admin-card .form-label {
+    font-weight: 500;
+  }
+  
+  .admin-card .form-control {
+    border-radius: 4px;
+    margin-bottom: 15px;
+  }
+  
+  .admin-card .btn-primary {
+    background-color: #000; /* Dark color for the button */
+    border: none;
+  }
+  
+  .admin-card .btn-primary:hover {
+    background-color: #000; /* Slightly lighter dark color on hover */
+  }
+  
+  .alert {
+    margin-top: 15px;
+  }

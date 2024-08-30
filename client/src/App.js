@@ -5,11 +5,12 @@ import Home from './components/Home';
 import Login from './components/Login';
 import Form from './components/Form';
 import Profile from './components/Profile';
-import Sign from './components/Sign';
 import ChatBot from './components/ChatBot';
 import './App.css';
 import Admin from './components/Admin';
-import AddCare from './components/AddCare';
+import PatientList from './components/PatientsList';
+import ReportsList from './components/ReportsList';
+import ReportsDisplay from './components/ReportsDisplay';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -36,11 +37,12 @@ const App = () => {
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login setIsLoggedIn={setIsLoggedIn} />} />
         <Route path='/form' element={isLoggedIn && sessionStorage.getItem('userType') === 'Care Taker' ? <Form /> : <Home />} />
+        <Route path='/reports' element={isLoggedIn && (sessionStorage.getItem('userType') === 'Care Taker' || sessionStorage.getItem('userType') ==='doctor')? <PatientList /> : <Home />} />
+        <Route path='/reportsList/:userId' element={isLoggedIn && (sessionStorage.getItem('userType') === 'Care Taker'  || sessionStorage.getItem('userType') ==='doctor')? <ReportsList /> : <Home />} />
+        <Route path='/report/:reportId' element={isLoggedIn && (sessionStorage.getItem('userType') === 'Care Taker' || sessionStorage.getItem('userType') ==='doctor') ? <ReportsDisplay/> : <Home />} />
         <Route path='/profile' element={<Profile />} />
-        <Route path='/signup' element={<Sign />} />
         <Route path='/chatbot' element={isLoggedIn && sessionStorage.getItem('userType') === 'doctor' ? <ChatBot /> : <Home />} />
-        <Route path='/admin' element={isLoggedIn && sessionStorage.getItem('userType') === 'admin' ? <Admin /> : <Home />} />
-        <Route path='/addcare' element={isLoggedIn && sessionStorage.getItem('userType') === 'admin' ? <AddCare></AddCare> : <Home />} />
+        <Route path='/Admin' element={isLoggedIn && sessionStorage.getItem('userType') === 'admin' ? <Admin /> : <Home />} />
       </Routes>
     </div>
   );

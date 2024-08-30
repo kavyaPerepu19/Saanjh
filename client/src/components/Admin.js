@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 const Admin = () => {
-  const [name, setName] = useState('');
-  const [age, setAge] = useState('');
-  const [gender, setGender] = useState('');
-  const [notification, setNotification] = useState({ message: '', type: '' });
+  const [registerType, setRegisterType] = useState('patient');
+  const [patientData, setPatientData] = useState({ name: '', age: '', gender: '' });
+  const [careData, setCareData] = useState({ username: '', password: '' });
+  const [signedUp, setSignedUp] = useState(false);
+  const [errorSigningUp, setErrorSigningUp] = useState('');
   const [userId, setUserId] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handlePatientSubmit = async (e) => {
     e.preventDefault();
-
+    const { name, age, gender } = patientData;
     try {
       const response = await fetch('http://localhost:8080/api/addpatient', {
         method: 'POST',
@@ -18,169 +22,180 @@ const Admin = () => {
         },
         body: JSON.stringify({ name, age, gender }),
       });
-
       const responseData = await response.json();
       if (response.ok) {
-        setNotification({ message: 'Patient added successfully!', type: 'success' });
-        setUserId(responseData.userId); // assuming response contains userId
-        // Optionally, clear the form or redirect after successful registration
-        setName('');
-        setAge('');
-        setGender('');
-
-        setTimeout(() => {
-          setNotification({ message: '', type: '' });
-          setUserId('');
-        }, 2000); // Reset notification after 5000ms
-
+        toast.success('Patient added successfully!');
+        setPatientData({ name: '', age: '', gender: '' });
       } else {
-        setNotification({ message: `Failed to add patient: ${responseData.error}`, type: 'error' });
+        toast.error(`Failed to add patient: ${responseData.error}`);
       }
     } catch (error) {
       console.error('Error adding patient:', error);
-      setNotification({ message: 'Error adding patient. Please try again.', type: 'error' });
+      toast.error('Error adding patient. Please try again.');
     }
   };
 
-  const backgroundStyle = {
-    backgroundImage: "url('https://wallpaperaccess.com/full/958470.jpg')",
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    height: '100vh',
-    position: 'relative',
-    overflowY: 'auto',
+  const handleCareSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const resp = await axios.post('http://localhost:8080/api/signup', { ...careData });
+      if (resp.data) {
+        setUserId(resp.data.userId);
+        setSignedUp(true);
+        setErrorSigningUp('');
+        toast.success('Caregiver added successfully!');
+        
+        setTimeout(() => {
+          setCareData({ username: '', password: '' });
+          setSignedUp(false);
+        }, 2000);
+        
+      } 
+      else if(resp.status==500)
+      {
+        toast.error('Error while adding caregiver');
+      }
+      else {
+        setSignedUp(false);
+        setErrorSigningUp("Error while adding caregiver");
+        toast.error('Error while adding caregiver');
+      }
+    } catch (error) {
+      console.log("Error while adding caregiver", error);
+      setSignedUp(false);
+      setErrorSigningUp("Error while adding caregiver");
+     
+    }
   };
 
-  const blurOverlayStyle = {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    bottom: 0,
-    width: '100%',
-    height: '100%',
-    backdropFilter: 'blur(6px)',
-    zIndex: 0,
-    overflowY: 'auto',
-  };
-
-  const contentStyle = {
-    zIndex: 1,
-    position: 'absolute',
-    top: '56%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    color: 'black',
-    textAlign: 'center',
-    fontFamily: 'Roboto, sans-serif',
-    backgroundColor: 'rgba(220, 220, 220, 0.76)',
-    padding: '2rem',
-    borderRadius: '8px',
-    boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
-    width: '100%',
-    maxWidth: '500px',
-    overflowY: 'auto',
-  };
-
-  const styles = {
-    formGroup: {
-      marginBottom: '1rem',
-    },
-    formLabel: {
-      marginBottom: '.5rem',
-      display: 'block',
-    },
-    formControl: {
-      width: '100%',
-      padding: '.5rem',
-      borderRadius: '4px',
-      border: '1px solid #ced4da',
-    },
-    button: {
-      width: '100%',
-      padding: '.75rem',
-      backgroundColor: '#007bff',
-      color: '#fff',
-      border: 'none',
-      borderRadius: '4px',
-      cursor: 'pointer',
-    },
-    h2: {
-      textAlign: 'center',
-      marginBottom: '2rem',
-    },
-    notification: {
-      padding: '1rem',
-      borderRadius: '4px',
-      marginBottom: '1rem',
-    },
-    success: {
-      backgroundColor: '#d4edda',
-      color: '#155724',
-    },
-    error: {
-      backgroundColor: '#f8d7da',
-      color: '#721c24',
-    },
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (registerType === 'patient') {
+      setPatientData({ ...patientData, [name]: value });
+    } else {
+      setCareData({ ...careData, [name]: value });
+    }
   };
 
   return (
-    <div style={backgroundStyle}>
-      <div style={blurOverlayStyle}></div>
-      <div style={contentStyle}>
-        <h2 style={styles.h2}>Admin Register</h2>
-        {notification.message && (
-          <div style={{ ...styles.notification, ...(notification.type === 'success' ? styles.success : styles.error) }}>
-            {notification.message}
+    <div className="flex items-center justify-center w-full h-screen relative overflow-hidden">
+      <div className="relative z-2">
+        <div className=" bg-opacity-80 p-8 rounded-lg shadow-md" style={{ background: 'rgba(136, 210, 216, 0.5)', top: '20%' }}>
+          <h2 className="text-2xl mb-4 text-center">
+            {registerType === 'patient' ? 'Patient Registration' : 'Caregiver Registration'}
+          </h2>
+          <div className="flex justify-center mb-4">
+            <button
+              className={`mx-2 py-2 px-4 rounded ${registerType === 'patient' ? 'bg-black text-white' : 'bg-gray-200'}`}
+              onClick={() => setRegisterType('patient')}
+            >
+              Register Patient
+            </button>
+            <button
+              className={`mx-2 py-2 px-4 rounded ${registerType === 'care' ? 'bg-black text-white' : 'bg-gray-300'}`}
+              onClick={() => setRegisterType('care')}
+            >
+              Register Caregiver
+            </button>
           </div>
-        )}
-        {userId && (
-          <div style={{ ...styles.notification, ...styles.success }}>
-            User ID: {userId}
-          </div>
-        )}
-        <form onSubmit={handleSubmit}>
-          <div style={styles.formGroup}>
-            <label style={styles.formLabel} htmlFor="formName">Name</label>
-            <input
-              className='text-dark'
-              id="formName"
-              type="text"
-              placeholder="Enter name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              style={styles.formControl}
-            />
-          </div>
-          <div style={styles.formGroup}>
-            <label style={styles.formLabel} htmlFor="formAge">Age</label>
-            <input
-              className='text-dark'
-              id="formAge"
-              type="number"
-              placeholder="Enter age"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              required
-              style={styles.formControl}
-            />
-          </div>
-          <div style={styles.formGroup}>
-            <label style={styles.formLabel} htmlFor="formGender">Gender</label>
-            <input
-              className='text-dark'
-              id="formGender"
-              type="text"
-              placeholder="Enter gender"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-              required
-              style={styles.formControl}
-            />
-          </div>
-          <button type="submit" style={styles.button}>Add Patient</button>
-        </form>
+
+          {registerType === 'patient' ? (
+            <form onSubmit={handlePatientSubmit}>
+              <div className="mb-4">
+                <label className="block font-medium mb-1" htmlFor="name">
+                  Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="Enter name"
+                  value={patientData.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-medium mb-1" htmlFor="age">
+                  Age
+                </label>
+                <input
+                  type="number"
+                  id="age"
+                  name="age"
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="Enter age"
+                  value={patientData.age}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-medium mb-1" htmlFor="gender">
+                  Gender
+                </label>
+                <input
+                  type="text"
+                  id="gender"
+                  name="gender"
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="Enter gender"
+                  value={patientData.gender}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-900"
+              >
+                Add Patient
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleCareSubmit}>
+              <div className="mb-4">
+                <label className="block font-medium mb-1" htmlFor="username">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  name="username"
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="Enter username"
+                  value={careData.username}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block font-medium mb-1" htmlFor="password">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="Enter password"
+                  value={careData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-900"
+              >
+                Add Caregiver
+              </button>
+            </form>
+          )}
+        </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

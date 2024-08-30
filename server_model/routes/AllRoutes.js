@@ -1,9 +1,10 @@
 const express = require("express");
-const { usersModel, patientIdModel,reportIdsModel,careIDsModel,reportDatasModel, } = require("../schemas/allSchemas");
+const { usersModel, patientIdModel, reportIdsModel, careIDsModel, reportDatasModel ,predictionsModel} = require("../schemas/allSchemas");
 const allroutes = express.Router();
 const multer = require("multer");
 const upload = multer();
 
+// Function to generate a unique user ID
 const generateUniqueUserId = async () => {
   let unique = false;
   let userId;
@@ -19,14 +20,53 @@ const generateUniqueUserId = async () => {
   return userId;
 };
 
+// Root endpoint
 allroutes.get('/', (req, res) => {
   console.log("Reached root");
   res.send("Backend home");
 });
 
+
+allroutes.post("/submit", async (req, res) => {
+  const { userId, date, ...AllData } = req.body;
+  
+  const reportData = AllData;
+  const DocNote = "";
+  const dietPlan = "";
+
+  if (!userId || !date || !AllData) {
+    return res.status(400).send("User ID, date, and report data are required");
+  }
+
+  try {
+    const newReportData = new reportDatasModel({
+      userId,
+      date,
+      reportPdf: reportData,
+      docNote: DocNote,
+      dietPlan: dietPlan,
+    });
+    
+    const savedReportData = await newReportData.save();
+
+    const updatedReportIds = await reportIdsModel.findOneAndUpdate(
+      { userId },
+      { $push: { ALLreportIDs: savedReportData._id } },
+      { upsert: true, new: true }
+    );
+
+    console.log(savedReportData);
+    res.send({ success: true, message: "Data saved successfully", report: savedReportData, reportIds: updatedReportIds });
+  } catch (error) {
+    console.error('Error saving data:', error);
+    res.status(500).send('Internal Server Error: Failed to save data');
+  }
+}); 
+
+// Endpoint to get user IDs
 allroutes.get('/userIds', async (req, res) => {
   try {
-    const userIds = await patientIdModel.find({}, 'userId  name');
+    const userIds = await patientIdModel.find({}, 'userId name');
     res.json(userIds);
   } catch (error) {
     console.error('Error fetching userIds:', error);
@@ -34,7 +74,80 @@ allroutes.get('/userIds', async (req, res) => {
   }
 });
 
+// Endpoint to get reports by user ID
+allroutes.get('/reports/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const reports = await reportIdsModel.find({ userId });
+    res.status(200).json(reports);
+  } catch (error) {
+    console.error('Error fetching reports:', error);
+    res.status(500).json({ error: 'Internal Server Error: Failed to fetch reports' });
+  }
+});
 
+// Endpoint to get report data by report ID
+allroutes.get('/reportData/:reportId', async (req, res) => {
+  try {
+    const { reportId } = req.params;
+    const reportData = await reportDatasModel.findOne({ _id: reportId });
+    if (!reportData) {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+    res.json(reportData);
+  } catch (error) {
+    console.error('Error fetching report data:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+allroutes.post('/previous-diagnoses', async (req, res) => {
+  try {
+    const { reportIds } = req.body;
+    const diagnoses = await predictionsModel.find({ reportIds: { $in: reportIds } });
+    res.status(200).json(diagnoses);
+  } catch (error) {
+    console.error('Error fetching previous diagnoses:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+allroutes.post('/updateDocNote', async (req, res) => {
+  const { reportId, docNote } = req.body;
+  try {
+    const updatedReport = await reportDatasModel.findByIdAndUpdate(
+      reportId,
+      { docNote },
+      { new: true }
+    );
+    if (!updatedReport) {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+    res.json(updatedReport);
+  } catch (error) {
+    console.error('Error updating doctor\'s note:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+allroutes.post('/updateDietPlan', async (req, res) => {
+  const { reportId, dietPlan } = req.body;
+  try {
+    const updatedReport = await reportDatasModel.findByIdAndUpdate(
+      reportId,
+      { dietPlan },
+      { new: true }
+    );
+    if (!updatedReport) {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+    res.json(updatedReport);
+  } catch (error) {
+    console.error('Error updating diet plan:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Endpoint to add a new patient
 allroutes.post('/addpatient', upload.none(), async (req, res) => {
   try {
     console.log(req.body);
@@ -71,24 +184,25 @@ allroutes.post('/addpatient', upload.none(), async (req, res) => {
     // Create a new patient
     let newPatient = new patientIdModel({
       userId,
-      name: req.body.name,
-      age: req.body.age,
-      gender: req.body.gender,
+      name,
+      age,
+      gender,
       caretakerId: assignedCaretaker.userId
     });
 
     let patientFromDB = await newPatient.save();
     let newReportId = new reportIdsModel({
       userId,
-      ALLreportIDs:[],
-      PredictionID:[]
-    })
+      ALLreportIDs: [],
+      PredictionID: []
+    });
     let ReportIdfromDb = await newReportId.save();
+
     // Update the caretaker's patientIds array
     assignedCaretaker.patientIds.push(userId);
     await assignedCaretaker.save();
 
-    console.log(patientFromDB,ReportIdfromDb);
+    console.log(patientFromDB, ReportIdfromDb);
     res.send(patientFromDB);
   } catch (err) {
     console.log("Error while adding patient. Check if it is duplicate.");
@@ -97,7 +211,7 @@ allroutes.post('/addpatient', upload.none(), async (req, res) => {
   }
 });
 
-
+// Endpoint to sign up a new user
 allroutes.post('/signup', upload.none(), async (req, res) => {
   try {
     console.log(req.body);
@@ -130,6 +244,7 @@ allroutes.post('/signup', upload.none(), async (req, res) => {
   }
 });
 
+// Endpoint to log in a user
 allroutes.post('/login', upload.none(), async (req, res) => {
   try {
     console.log(req.body);
@@ -149,46 +264,5 @@ allroutes.post('/login', upload.none(), async (req, res) => {
     res.status(500).send(err);
   }
 });
-
-allroutes.post("/save", async (req, res) => {
-  const { userId, date, ...AllData } = req.body;
-  
-  const reportData = AllData;
-  const DocNote = "";
-  const dietPlan = "";
-  const week = ""; // Ensure the 'week' value is passed in the request body or modify accordingly.
-  delete reportData['Patient Details'];
-
-  if (!userId || !date || !AllData) {
-    return res.status(400).send("User ID, week number, and report data are required");
-  }
-
-  try {
-    // Create new reportData object
-    const newReportData = new reportDatasModel({
-      userId,
-      date,
-      reportPdf: reportData,
-      docNote: DocNote,
-      dietPlan: dietPlan,
-    });
-    
-    // Save the new reportData object
-    const savedReportData = await newReportData.save();
-
-    // Update reportIdsModel with new reportData object ID
-    const updatedReportIds = await reportIdsModel.findOneAndUpdate(
-      { userId },
-      { $push: { ALLreportIDs: savedReportData._id } },
-      { upsert: true, new: true }
-    );
-
-    res.send({ success: true, message: "Data saved successfully", report: savedReportData, reportIds: updatedReportIds });
-  } catch (error) {
-    console.error('Error saving data:', error);
-    res.status(500).send('Internal Server Error: Failed to save data');
-  }
-});
-
 
 module.exports = allroutes;

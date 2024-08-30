@@ -3,24 +3,6 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Login = ({ setIsLoggedIn }) => {
-  const backgroundStyle = {
-    backgroundImage: "url('https://wallpaperaccess.com/full/958470.jpg')",
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
-    height: '120vh',
-    position: 'relative',
-  };
-
-  const blurOverlayStyle = {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backdropFilter: 'blur(6px)',
-    zIndex: 0,
-  };
-
   const [formObj, setFormObj] = useState({ username: "", password: "" });
   const [loggedIn, setLoggedIn] = useState(false);
   const [errorLoggingIn, setErrorLoggingIn] = useState('');
@@ -66,44 +48,42 @@ const Login = ({ setIsLoggedIn }) => {
   );
 
   return (
-    <div style={backgroundStyle}>
-      <div style={blurOverlayStyle}></div>
-      <div className="d-flex justify-content-center align-items-center">
-        <div className="card p-4" style={{ backgroundColor: 'rgba(220, 220, 220, 0.76)', maxWidth: "400px", width: "100%", marginTop: '10%' }}>
-          <h1 className="mb-4 text-3xl font-extrabold text-primary md:text-5xl lg:text-5xl pb-2 flex items-center">Login</h1>
+    <div className="min-h-screen flex">
+      <div className="w-1/2 flex items-center justify-center bg-gray-100">
+        <img src="https://thyro-aid.vercel.app/static/media/login.7a8c2a7225fdec8c6f23.png" alt="Login" className="w-full h-full object-cover" />
+      </div>
+      <div className="w-1/2 flex items-center justify-center bg-gray-100">
+        <div className="w-full max-w-md p-8 rounded-xl shadow-lg" style={{ background: 'rgba(136, 210, 216, 0.5)' }}>
+          <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
           <form onSubmit={handleSubmit}>
             {errorLoggingIn && <Error />}
-            <div className="mb-3">
-              <label htmlFor="username" className="form-label text-dark">
-                Username
-              </label>
+            <div className="mb-4">
+              <label htmlFor="username" className="form-label text-gray-600">Username</label>
               <input
                 type="text"
-                className="form-control form-control-sm"
+                className="form-control form-control-sm border border-gray-300 rounded-xl py-2 px-3 w-full"
                 id="username"
                 name="username"
                 value={formObj.username}
                 onChange={changeHandler}
               />
             </div>
-            <div className="mb-3">
-              <label htmlFor="password" className="form-label text-dark">
-                Password
-              </label>
+            <div className="mb-4">
+              <label htmlFor="password" className="form-label text-gray-600">Password</label>
               <input
                 type="password"
-                className="form-control form-control-sm"
+                className="form-control form-control-sm border border-gray-300 rounded py-2 px-3 w-full"
                 id="password"
                 name="password"
                 value={formObj.password}
                 onChange={changeHandler}
               />
             </div>
-            <button type="submit" className="mt-3 text-light bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2">
+            <button type="submit" className="bg-blue-500 text-white font-semibold py-2 px-4 rounded w-full" style={{ background: 'black' }}>
               Submit
             </button>
           </form>
-          {loggedIn && <div className="alert alert-success mt-3">Successfully logged in! Redirecting to home...</div>}
+          {loggedIn && <div className="alert alert-success mt-4 text-center">Successfully logged in! Redirecting to home...</div>}
         </div>
       </div>
     </div>

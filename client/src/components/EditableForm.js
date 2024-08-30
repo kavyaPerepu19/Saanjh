@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const getWeekNumber = () => {
   const currentDate = new Date();
@@ -8,22 +9,12 @@ const getWeekNumber = () => {
 };
 
 const EditableForm = ({ selectedPatientId, initialData }) => {
-  console.log('EditableForm selectedPatientId:', selectedPatientId);
   const [formData, setFormData] = useState(initialData || {});
   const [isEditing, setIsEditing] = useState(false);
-  const [diagnosisReport, setDiagnosisReport] = useState(null);
-  
-  const reportRef = useRef(null);
 
   useEffect(() => {
     setFormData(initialData);
   }, [initialData]);
-
-  useEffect(() => {
-    if (reportRef.current) {
-      reportRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [diagnosisReport]);
 
   const handleInputChange = (e, path) => {
     const { name, value } = e.target;
@@ -45,101 +36,179 @@ const EditableForm = ({ selectedPatientId, initialData }) => {
 
       if (typeof value === 'object' && value !== null) {
         return (
-          <div key={key} style={{ marginBottom: '10px' }}>
-            <strong style={{ display: 'block', marginTop: '10px', marginBottom: '5px', color: 'black' }}>{key}</strong>
+          <section key={key} style={styles.section}>
+            <h3 style={styles.sectionTitle}>{key}</h3>
             {renderFields(value, currentPath)}
-          </div>
+          </section>
         );
       } else {
         return (
-          <div key={key} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', marginTop: '5%' }}>
-            <div style={{ width: '150px', height: '30px', fontWeight: '400', borderRadius: '6px', padding: '4px', textAlign: 'center', backgroundColor: '#007bff', color: '#fff' }}>
-              {key}
-            </div>
-            <div style={{ flexGrow: 1, paddingLeft: '1rem', borderRadius: '6px', paddingTop: '4px', backgroundColor: 'transparent' }}>
-              {isEditing ? (
-                <input
-                  className='text-dark'
-                  type="text"
-                  name={key}
-                  value={value}
-                  onChange={(e) => handleInputChange(e, currentPath)}
-                  style={{ width: '100%', height: '40px', color: 'black', border: '1px solid #ccc', borderRadius: '4px', padding: '8px', backgroundColor: 'rgba(220, 220, 220, 0.76)' }}
-                />
-              ) : (
-                <div
-                  style={{
-                    width: '100%',
-                    height: '40px',
-                    color: 'black',
-                    backgroundColor: 'rgba(220, 220, 220, 0.76)',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    padding: '8px',
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  {value}
-                </div>
-              )}
-            </div>
+          <div key={key} style={styles.listItem}>
+            <strong style={styles.listItemKey}>{key}:</strong>
+            {isEditing ? (
+              <input
+                type="text"
+                name={key}
+                value={value}
+                onChange={(e) => handleInputChange(e, currentPath)}
+                style={styles.input}
+              />
+            ) : (
+              <span>{value}</span>
+            )}
           </div>
         );
       }
     });
   };
 
- 
-
- 
-  const handleSave = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       const weekNumber = getWeekNumber();
       const dataToSave = { ...formData, userId: selectedPatientId, date: weekNumber };
-      const response = await axios.post('http://localhost:8080/api/save', dataToSave);
+      const response = await axios.post('http://localhost:8080/api/submit', dataToSave);
+      toast.success('Report submitted successfully!');
       console.log('Save response:', response.data);
       setIsEditing(false);
     } catch (error) {
       console.error('Error saving data:', error);
+      toast.error('Error submitting report. Please try again.');
     }
   };
 
-  
+  const handleSave = async () => {
+    try {
+      const response = await axios.post('http://localhost:8080/save', formData);
+      toast.success('Report saved successfully!');
+      console.log('Save response:', response.data);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving data:', error);
+      toast.error('Error saving report. Please try again.');
+    }
+  };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '75vh', marginTop: '6%' }}>
-      <div className='border rounded-xl' style={{ backgroundColor: 'rgba(220, 220, 220, 0.76)' }}>
-        <h1 className="mb-4 text-3xl font-extrabold text-blue-600 md:text-5xl lg:text-5xl pb-2 flex items-center justify-center">
-          Report Details
-          <span className="ml-4">
-            <img width={40} src="https://res.cloudinary.com/duwadnxwf/image/upload/v1716300380/patient_u29wkb.png" alt="patient icon" />
-          </span>
-        </h1>
-
-        {renderFields(formData)}
-
-        <div className='flex justify-center mt-5'>
-          <button
-            type="button"
-            className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2"
-            onClick={() => setIsEditing(!isEditing)}
-          >
-            {!isEditing && <img src="https://res.cloudinary.com/duwadnxwf/image/upload/v1716276383/icons8-edit-24_fpgba3.png" className="h-6 w-5 pb-1" />}
-            {isEditing ? 'Cancel' : 'Edit'}
-          </button>
-          {isEditing &&
-            <button type="button"
-              className="mt-3 mb-5 text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br font-medium rounded-lg text-s px-4 py-2.5 text-center inline-flex items-center me-2 mb-2"
-              onClick={handleSave}>Save</button>}
-        </div>
-
-
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <h2 style={styles.title}>Report Details</h2>
       </div>
 
-       
+      <div>
+        {renderFields(formData)}
+
+        <div style={styles.buttonContainer}>
+          {isEditing ? (
+            <>
+              <button type="button" style={styles.button} onClick={() => setIsEditing(false)}>
+                Cancel
+              </button>
+              <button type="button" style={styles.button} onClick={handleSave}>
+                Save
+              </button>
+            </>
+          ) : (
+            <form onSubmit={handleSubmit} style={styles.form}>
+              <button type="submit" style={styles.button}>
+                Submit
+              </button>
+              <button type="button" style={styles.button} onClick={() => setIsEditing(true)}>
+                Edit
+              </button>
+            </form>
+          )}
+        </div>
+
+        <ToastContainer />
+      </div>
     </div>
   );
+};
+
+const styles = {
+  container: {
+    backgroundColor: '#f9fafb',
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    borderRadius: '0.5rem',
+    padding: '1.5rem',
+    width: '100%',
+    border: '1px solid #e5e7eb',
+    transition: 'all 0.3s',
+    fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif',
+    color: '#2c3e50',
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#4a90e2',
+    color: 'white',
+    padding: '0.75rem 1.5rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    transition: 'background-color 0.3s',
+    marginBottom: '1.5rem',
+  },
+  title: {
+    fontSize: '1.75rem',
+    fontWeight: '600',
+    color: '#FFFFFF',
+    textAlign: 'left',
+  },
+  section: {
+    marginBottom: '1.5rem',
+    backgroundColor: '#ffffff',
+    padding: '1rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    borderLeft: '4px solid #4a90e2',
+  },
+  sectionTitle: {
+    fontSize: '1.25rem',
+    fontWeight: '600',
+    borderBottom: '2px solid #ecf0f1',
+    paddingBottom: '0.5rem',
+    color: '#34495e',
+  },
+  listItem: {
+    marginBottom: '0.5rem',
+    display: 'flex',
+    alignItems: 'center',
+  },
+  listItemKey: {
+    color: '#2c3e50',
+    fontWeight: '600',
+    marginRight: '0.5rem',
+  },
+  input: {
+    width: '100%',
+    backgroundColor: '#f9fafb',
+    color: '#2c3e50',
+    fontWeight: '600',
+    padding: '0.5rem',
+    borderRadius: '0.25rem',
+    border: '1px solid #e5e7eb',
+  },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    marginTop: '1.5rem',
+  },
+  button: {
+    backgroundColor: '#4a90e2',
+    color: 'white',
+    padding: '0.75rem 1.5rem',
+    borderRadius: '0.5rem',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    transition: 'background-color 0.3s',
+    cursor: 'pointer',
+    border: 'none',
+  },
+  form: {
+    display: 'flex',
+    justifyContent: 'space-between',
+  },
 };
 
 export default EditableForm;
