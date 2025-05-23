@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-
 const Login = ({ setIsLoggedIn }) => {
   const [formObj, setFormObj] = useState({ username: "", password: "" });
   const [loggedIn, setLoggedIn] = useState(false);
   const [errorLoggingIn, setErrorLoggingIn] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // NEW
   const navigate = useNavigate();
 
   const changeHandler = (e) => {
@@ -15,19 +15,16 @@ const Login = ({ setIsLoggedIn }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formObj);
+    setIsLoading(true); // Start loader
+    setErrorLoggingIn('');
 
     try {
       const resp = await axios.post('http://localhost:8000/api/login', { ...formObj });
-      
-      console.log(resp);
       if (resp.data.success) {
         setLoggedIn(true);
-        setErrorLoggingIn('');
         sessionStorage.setItem('isLoggedIn', 'true');
-        sessionStorage.setItem('userType', resp.data.user.userType); // Store userType
+        sessionStorage.setItem('userType', resp.data.user.userType);
         setIsLoggedIn(true);
-        console.log("Successfully logged in");
         setTimeout(() => {
           navigate('/');
         }, 2000);
@@ -36,16 +33,23 @@ const Login = ({ setIsLoggedIn }) => {
         setErrorLoggingIn("Invalid username or password");
       }
     } catch (error) {
-      console.log("Error while logging in");
-      console.log(error);
+      console.error("Error while logging in", error);
       setLoggedIn(false);
       setErrorLoggingIn("Error while logging in");
+    } finally {
+      setIsLoading(false); // Stop loader
     }
   };
 
   const Error = () => (
     <div className="alert alert-danger" role="alert">
       {errorLoggingIn}
+    </div>
+  );
+
+  const Loader = () => (
+    <div className="flex justify-center my-4">
+      <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-black"></div>
     </div>
   );
 
@@ -68,6 +72,7 @@ const Login = ({ setIsLoggedIn }) => {
                 name="username"
                 value={formObj.username}
                 onChange={changeHandler}
+                disabled={isLoading}
               />
             </div>
             <div className="mb-4">
@@ -79,11 +84,17 @@ const Login = ({ setIsLoggedIn }) => {
                 name="password"
                 value={formObj.password}
                 onChange={changeHandler}
+                disabled={isLoading}
               />
             </div>
-            <button type="submit" className="bg-blue-500 text-white font-semibold py-2 px-4 rounded w-full" style={{ background: 'black' }}>
-              Submit
+            <button
+              type="submit"
+              className="bg-black text-white font-semibold py-2 px-4 rounded w-full"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Logging in...' : 'Submit'}
             </button>
+            {isLoading && <Loader />}
           </form>
           {loggedIn && <div className="alert alert-success mt-4 text-center">Successfully logged in! Redirecting to home...</div>}
         </div>

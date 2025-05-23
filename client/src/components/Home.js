@@ -7,10 +7,12 @@ const Home = () => {
   return (
     <div className="container">
       <div className="image-section mx-1.5 my-1.5">
-        <img
-          src="https://res.cloudinary.com/dim9xwntk/image/upload/v1721312004/images/ouyhqdbtledtbyxt3u83.png"
-          alt="Placeholder Image"
-        />
+      <img
+  src="https://drive.google.com/uc?export=view&id=11tdCqHZ65Tk0HlDCjIT_TuZK3v4e-LyR"
+  alt="Elderly care"
+/>
+
+
       </div>
       
       <div className="mx-1.5 text-section">
