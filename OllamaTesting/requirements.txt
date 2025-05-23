@@ -1,0 +1,7 @@
+Flask
+langchain
+langchain-community
+chromadb
+langchain-google-genai
+google-generativeai
+ollama

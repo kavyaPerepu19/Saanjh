@@ -15,7 +15,7 @@ const Admin = () => {
     e.preventDefault();
     const { name, age, gender } = patientData;
     try {
-      const response = await fetch('http://localhost:8080/api/addpatient', {
+      const response = await fetch('http://localhost:8000/api/addpatient', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ const Admin = () => {
   const handleCareSubmit = async (e) => {
     e.preventDefault();
     try {
-      const resp = await axios.post('http://localhost:8080/api/signup', { ...careData });
+      const resp = await axios.post('http://localhost:8000/api/signup', { ...careData });
       if (resp.data) {
         setUserId(resp.data.userId);
         setSignedUp(true);

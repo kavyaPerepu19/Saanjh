@@ -138,7 +138,7 @@ app.post('/diagnose', async (req, res) => {
     let reportText = JSON.stringify(report.reportPdf, null, 2);
     reportText +="diagnoise the report and predict the disease ";
     // Make the request to the Flask API
-    const response = await axios.post('http://localhost:5002/diagnose', {
+    const response = await axios.post(`${process.env.FLASK_BACKEND_ollama}/diagnose`, {
       content: reportText
     });
     
@@ -291,7 +291,7 @@ app.post('/ask-question', async (req, res) => {
   const { question } = req.body;
 
   try {
-    const response = await axios.post('http://localhost:5001/ask', { question });
+    const response = await axios.post(`${process.env.FLASK_BACKEND_BOT}/ask`, { question });
     res.json(response.data);
     console.log(response.data);
   } catch (error) {
@@ -313,7 +313,7 @@ let db = async () => {
 db();
 
 app.use('/api', allroutes);
-const port = 8080;
+const port = 8000;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
 });

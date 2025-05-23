@@ -1,57 +1,71 @@
 from flask import Flask, request, jsonify
-from pathlib import Path as p
-
-from langchain import PromptTemplate
-from langchain.chains import RetrievalQA
-from langchain.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import Chroma
-from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+import google.generativeai as genai
+from PyPDF2 import PdfReader
+import os
 
 app = Flask(__name__)
 
-# Initialize model and embeddings
-GOOGLE_API_KEY = "AIzaSyAOrJc0CyugZqXKXCAvZTFkTBKTqH5fq4A"
-model = ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=GOOGLE_API_KEY, temperature=0.2, convert_system_message_to_human=True)
-embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001", google_api_key=GOOGLE_API_KEY)
+# Replace with your Gemini API key
+GOOGLE_API_KEY = "YOUR_GOOGLE_API_KEY"
+genai.configure(api_key=GOOGLE_API_KEY)
 
-def create_qa_chain(pdf_path):
-    pdf_loader = PyPDFLoader(pdf_path)
-    pages = pdf_loader.load_and_split()
-    context = "\n\n".join(str(p.page_content) for p in pages)
-    
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=1000)
-    texts = text_splitter.split_text(context)
-    
-    vector_index = Chroma.from_texts(texts, embeddings).as_retriever(search_kwargs={"k": 5})
-    
-    template = """Use the given pdf and answer the question asked based on the information in the pdf. It consists of patient details, so make sure you give answers based on the patient name. If you don't know the answer, just say that you don't know, don't try to make up an answer. Keep the answer as concise as possible. Always say "thanks for asking!" at the end of the answer.
-    {context}
-    Question: {question}
-    Helpful Answer:"""
-    QA_CHAIN_PROMPT = PromptTemplate.from_template(template)
-    
-    return RetrievalQA.from_chain_type(
-        model,
-        retriever=vector_index,
-        return_source_documents=True,
-        chain_type_kwargs={"prompt": QA_CHAIN_PROMPT}
-    )
+# Load PDF content once at the start or on upload
+PDF_PATH = "output.pdf"
+pdf_text = ""
 
-# Set the path to your PDF file here
-PDF_PATH = 'output.pdf'
+def extract_pdf_text(path):
+    try:
+        reader = PdfReader(path)
+        return "\n".join(page.extract_text() or "" for page in reader.pages)
+    except Exception as e:
+        return str(e)
 
-# Initialize QA chain with the provided PDF
-qa_chain = create_qa_chain(PDF_PATH)
+@app.route('/upload', methods=['POST'])
+def upload_pdf():
+    global pdf_text
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    save_path = os.path.join("uploads", file.filename)
+    os.makedirs("uploads", exist_ok=True)
+    file.save(save_path)
+
+    pdf_text = extract_pdf_text(save_path)
+    return jsonify({'message': 'PDF uploaded and processed successfully.'})
 
 @app.route('/ask', methods=['POST'])
-def ask_question():
-    question = request.json.get('question')
+def ask():
+    if not pdf_text:
+        return jsonify({"error": "No PDF uploaded or text extracted."}), 400
+
+    data = request.get_json()
+    question = data.get("question")
     if not question:
-        return jsonify({"error": "No question provided"}), 400
-    
-    result = qa_chain({"query": question})
-    return jsonify({"answer": result["result"]}), 200
+        return jsonify({"error": "No question provided."}), 400
+
+    prompt = f"""
+Use the patient report provided below to answer the question. 
+Only respond if the answer is in the text. Otherwise, say "I don't know".
+Always end the answer with "Thanks for asking!".
+
+Patient Report:
+{pdf_text}
+
+Question: {question}
+Answer:
+    """
+
+    try:
+        model = genai.GenerativeModel("gemini-1.5-pro")
+        response = model.generate_content(prompt)
+        return jsonify({"answer": response.text.strip()})
+    except Exception as e:
+        print(f"Error generating response: {e}")
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True,port=5001)
+    app.run(debug=True, port=5001)

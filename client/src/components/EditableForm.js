@@ -67,7 +67,7 @@ const EditableForm = ({ selectedPatientId, initialData }) => {
     try {
       const weekNumber = getWeekNumber();
       const dataToSave = { ...formData, userId: selectedPatientId, date: weekNumber };
-      const response = await axios.post('http://localhost:8080/api/submit', dataToSave);
+      const response = await axios.post('http://localhost:8000/api/submit', dataToSave);
       toast.success('Report submitted successfully!');
       console.log('Save response:', response.data);
       setIsEditing(false);
@@ -79,7 +79,7 @@ const EditableForm = ({ selectedPatientId, initialData }) => {
 
   const handleSave = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/save', formData);
+      const response = await axios.post('http://localhost:8000/save', formData);
       toast.success('Report saved successfully!');
       console.log('Save response:', response.data);
       setIsEditing(false);

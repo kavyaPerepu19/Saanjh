@@ -6,7 +6,7 @@ const ReportCard = ({ title, content, reportId, noteType, editable, reloadData }
 
   const handleAddNote = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/update${noteType === 'docNote' ? 'DocNote' : 'DietPlan'}`, {
+      const response = await fetch(`http://localhost:8000/api/update${noteType === 'docNote' ? 'DocNote' : 'DietPlan'}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

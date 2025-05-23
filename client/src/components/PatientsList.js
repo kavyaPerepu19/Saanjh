@@ -8,7 +8,7 @@ const PatientList = () => {
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/userIds');
+        const response = await axios.get('http://localhost:8000/api/userIds');
         setPatients(response.data);
       } catch (error) {
         console.error('Error fetching patients:', error);

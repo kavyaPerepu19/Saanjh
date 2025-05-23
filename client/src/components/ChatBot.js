@@ -12,7 +12,7 @@ const Chatbot = () => {
     if (!currentQuestion.trim()) return;
 
     try {
-      const response = await axios.post('http://localhost:8080/ask-question', { question: currentQuestion });
+      const response = await axios.post('http://localhost:8000/ask-question', { question: currentQuestion });
       setQuestions([...questions, { question: currentQuestion, answer: response.data.answer }]);
       setCurrentQuestion(''); // Clear the current question input after submission
     } catch (error) {

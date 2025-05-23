@@ -24,7 +24,7 @@ const ReportsDisplay = () => {
   // Function to fetch report data
   const fetchData = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/reportData/${reportId}`);
+      const response = await fetch(`http://localhost:8000/api/reportData/${reportId}`);
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Error ${response.status}: ${errorText}`);
@@ -41,7 +41,7 @@ const ReportsDisplay = () => {
   const handleDiagnose = async () => {
     try {
       setLoading(true);
-      const response = await axios.post('http://localhost:8080/diagnose', { userId: reportData.userId, reportId });
+      const response = await axios.post('http://localhost:8000/diagnose', { userId: reportData.userId, reportId });
       setPrediction(response.data);
       setLoading(false);
     } catch (error) {
@@ -55,7 +55,7 @@ const ReportsDisplay = () => {
   const fetchPreviousDiagnoses = async () => {
     try {
       setLoading(true);
-      const response = await axios.post('http://localhost:8080/api/previous-diagnoses', { reportIds: [reportId] });
+      const response = await axios.post('http://localhost:8000/api/previous-diagnoses', { reportIds: [reportId] });
       setPreviousDiagnoses(response.data);
       if (response.data.length === 0) {
         setPreviousDiagnoses([{ LLMPrediction: 'No previous diagnoses found. To diagnose, click on Diagnose again.', riskPercent: 'null' }]);
