@@ -34,7 +34,7 @@ const AddCare = () => {
     console.log(formObj);
 
     try {
-      const resp = await axios.post('http://localhost:8000/api/signup', { ...formObj });
+      const resp = await axios.post('https://saanjh-nine.vercel.app/api/signup', { ...formObj });
       console.log(resp);
       if (resp.data) {
         setUserId(resp.data.userId);

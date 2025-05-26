@@ -4,7 +4,7 @@ import axios from 'axios';
 // const makePredictionRequest = async (formData) => {
 //   console.log('before going Form data:', formData);
 //   try {
-//     const response = await axios.post('http://localhost:8000/query', {
+//     const response = await axios.post('https://saanjh-nine.vercel.app/query', {
 //       inputs: JSON.stringify(formData+"what is the diagnosis") // Convert formData to JSON string
 //     });
 //     console.log('Prediction response:', response.data[0]);
@@ -25,7 +25,7 @@ const makePredictionRequest = async (formData) => {
   }
 
   try {
-    const response = await axios.post('http://localhost:8000/query', {
+    const response = await axios.post('https://saanjh-nine.vercel.app/query', {
       inputs: formDataString + "what is the disease name in 150 words"
     });
     console.log('Prediction response:', response.data);

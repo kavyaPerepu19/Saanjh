@@ -19,7 +19,7 @@ const Login = ({ setIsLoggedIn }) => {
     setErrorLoggingIn('');
 
     try {
-      const resp = await axios.post('http://localhost:8000/api/login', { ...formObj });
+      const resp = await axios.post('https://saanjh-nine.vercel.app/api/login', { ...formObj });
       if (resp.data.success) {
         setLoggedIn(true);
         sessionStorage.setItem('isLoggedIn', 'true');

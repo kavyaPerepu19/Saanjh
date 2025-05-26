@@ -10,7 +10,7 @@ const SelectPatient = ({ onSelectPatient }) => {
 
   const fetchPatientIds = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/userIds');
+      const response = await axios.get('https://saanjh-nine.vercel.app/api/userIds');
       setPatientIds(response.data); 
     } catch (error) {
       console.error('Error fetching patient IDs:', error);
