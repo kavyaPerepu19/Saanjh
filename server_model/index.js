@@ -2,7 +2,7 @@ const express = require('express');
 
 const app = express();
 
-const allroutes = require('./routes/AllRoutes');
+// const allroutes = require('./routes/AllRoutes');
 const botroutes = require('./routes/bot');
 const reportroutes = require('./routes/report');
 const dataroutes = require('./routes/data');
