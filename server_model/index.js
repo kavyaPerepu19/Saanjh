@@ -1,29 +1,31 @@
 const express = require('express');
-const https = require('https');
+
 const app = express();
-const axios = require('axios');
+
 const allroutes = require('./routes/AllRoutes');
+const botroutes = require('./routes/bot');
+const reportroutes = require('./routes/report');
+const dataroutes = require('./routes/data');
+const logroutes = require('./routes/log');
+const diagroutes = require('./routes/prevdiag')
+const updateroutes = require('./routes/updatereport');
 const mongoose = require('mongoose');
-// const {predictionsModel,reportIdsModel,reportDatasModel}=require("./schemas/allSchemas");
+
 const cors = require('cors');
 const dotenv = require("dotenv");
 dotenv.config();
 app.use(express.json());
-const pdfParse = require('pdf-parse');
 
-const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+
+
 const bodyParser = require("body-parser");
-const { spawn } = require("child_process");
-const path = require("path");
-const fs = require("fs");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+
 
 
 dotenv.config();
 app.use(bodyParser.json());
 app.use(cors());
-const genAI = new GoogleGenerativeAI(process.env.API_KEY);
+
 
 
 
@@ -40,7 +42,14 @@ let db = async () => {
 }
 db();
 
-app.use('/api', allroutes);
+// app.use('/api', allroutes);
+app.use('/api/', botroutes);
+app.use('/api/', reportroutes);
+app.use('/api/', dataroutes);
+app.use('/api/', logroutes);
+app.use('/api/', diagroutes);
+app.use('/api/', updateroutes);
+
 const port = 8000;
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);

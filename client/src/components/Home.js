@@ -8,7 +8,7 @@ const Home = () => {
     <div className="container">
       <div className="image-section mx-1.5 my-1.5">
       <img
-  src="https://drive.google.com/uc?export=view&id=11tdCqHZ65Tk0HlDCjIT_TuZK3v4e-LyR"
+  src="./home.jpg"
   alt="Elderly care"
 />
 

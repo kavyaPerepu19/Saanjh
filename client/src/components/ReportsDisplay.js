@@ -41,7 +41,7 @@ const ReportsDisplay = () => {
   const handleDiagnose = async () => {
     try {
       setLoading(true);
-      const response = await axios.post('http://localhost:8000/diagnose', { userId: reportData.userId, reportId });
+      const response = await axios.post('http://localhost:8000/api/diagnose', { userId: reportData.userId, reportId });
       setPrediction(response.data);
       setLoading(false);
     } catch (error) {
