@@ -43,6 +43,10 @@ let db = async () => {
 db();
 
 // app.use('/api', allroutes);
+app.get('/', (req, res) => {
+  res.send('Welcome to the API');
+}
+);
 app.use('/api/', botroutes);
 app.use('/api/', reportroutes);
 app.use('/api/', dataroutes);
